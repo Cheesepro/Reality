@@ -1,0 +1,10 @@
+use-database: false
+database-host: 127.0.0.1
+database-port: 3306
+database-name: rpg
+database-username: root
+database-password: password
+RespawnLocation:
+Default_rank: creeper
+Default_allowed_ranks:
+    - creeper

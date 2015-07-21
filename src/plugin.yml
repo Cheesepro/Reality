@@ -1,0 +1,16 @@
+ name: Reality
+ version: 1.0
+ description: Custom RPG for MineFutureMC
+ author: Cheesepro
+ website: http://MineFutureMC.com
+ main: me.cheesepro.reality.Reality
+ softdepend: [Vault]
+
+ commands:
+   reality:
+     description: Reality admin commands
+     permission: reality.admin
+     permission-message: You don't have Permission!!
+ permissions:
+   reality.admin:
+     default: op

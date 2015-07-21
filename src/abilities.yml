@@ -1,0 +1,34 @@
+ abilities:
+   Explode:
+     item: BLAZE_ROD
+     item_name: "Explode STICK"
+     cooldown: 10
+   Teleport:
+     item: NETHER_STAR
+     item_name: "Teleporter"
+     cooldown: 5
+   FIREBALL:
+     item: FIREBALL
+     item_name: "Fireball launcher"
+     cooldown: 1
+   Witherskull:
+     item: SKULL_ITEM
+     item_name: "Witherskull launcher"
+     cooldown: 1
+   doublejump:
+     cooldown: 3
+   climb:
+     item: LADDER
+     item_name: "Climber"
+   cobweb:
+     item: WEB
+     item_name: "Cobwebber"
+     cooldown: 3
+   lightning:
+     item: GOLD_NUGGET
+     item_name: "Lightning wand"
+     cooldown: 10
+   feed:
+     item: SPECKLED_MELON
+     item_name: "Feeder"
+     cooldown: 60
