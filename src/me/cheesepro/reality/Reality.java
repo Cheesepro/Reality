@@ -108,9 +108,27 @@ public class Reality extends JavaPlugin implements Listener{
 
     /*
      * This map stores where the bosses located
-     * Format: Map<BossName, Map<x/y/z, values>
+     * Format: Map<BossName, Map<BossRoomName, Map<x/y/z, values>>>
      */
-    public static Map<String, Map<String, Double>> bossesLocations = new HashMap<String, Map<String, Double>>();
+    public static Map<String, Map<String, Map<String, Double>>> bRoomsBosses = new HashMap<String, Map<String, Map<String, Double>>>();
+
+    /*
+     * Stores Boss Rooms's regions names
+     * Format: Map<BossRoomName, RegionName>
+     */
+    public static Map<String, String> bRoomsRegions = new HashMap<String, String>();
+
+    /*
+     * Stores lobby,spawn,end and spectate locations of boss rooms
+     * Format: Map<BossRoomName, Map<lobby/spawn/end/spectate, Map<x/y/z, value>>>
+     */
+    public static Map<String, Map<String, Map<String, Double>>> bRoomsLocations = new HashMap<String, Map<String, Map<String, Double>>>();
+
+    /*
+     * Stores boss rooms maxplayer/minplayer/no action time out time
+     * Format: Map<BossRoomName, Map<maxplayer/minplayer/no action time out time, value>>
+     */
+    public static Map<String, Map<String, String>> bRoomsSettings = new HashMap<String, Map<String, String>>();
 
     /*
      * Stores the world where all the bosses will be allowed.
@@ -125,7 +143,7 @@ public class Reality extends JavaPlugin implements Listener{
     Config storageConfig;
     Config abilitiesConfig;
     Config cratesConfig;
-    Config bossesConfig;
+    Config bossRoomsConfig;
     World world;
     public static String pName = "[Reality]";
     private final JavaPlugin plugin = this;
@@ -196,7 +214,7 @@ public class Reality extends JavaPlugin implements Listener{
         levelsConfig = configManager.getNewConfig("levels.yml");
         configManager.copyDefaultConfig("luckycrates.yml");
         cratesConfig = configManager.getNewConfig("luckycrates.yml");
-        bossesConfig = configManager.getNewConfig("bosses.yml");
+        bossRoomsConfig = configManager.getNewConfig("BossRooms.yml");
     }
 
     private void cache(){
@@ -377,17 +395,79 @@ public class Reality extends JavaPlugin implements Listener{
         im.setDisplayName(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Lucky" + " " + ChatColor.GOLD.toString() + ChatColor.BOLD + "Crate Key");
         crateKey.setItemMeta(im);
 
-        if(bossesConfig.get("world")!=null) {
-            bossesWorld = String.valueOf(bossesConfig.get("world"));
-            if (bossesConfig.get("locations") != null) {
-                for (String bossName : bossesConfig.getConfigurationSection("locations").getKeys(false)) {
-                    Map<String, Double> location = new HashMap<String, Double>();
-                    location.put("x", bossesConfig.getDouble("locations." + bossName + ".x"));
-                    location.put("y", bossesConfig.getDouble("locations." + bossName + ".y"));
-                    location.put("z", bossesConfig.getDouble("locations." + bossName + ".z"));
-                    bossesLocations.put(bossName.toLowerCase(), location);
+        if(bossRoomsConfig.get("world")!=null) {
+            bossesWorld = String.valueOf(bossRoomsConfig.get("world"));
+            if(bossRoomsConfig.get("rooms")!=null){
+                for(String roomName : bossRoomsConfig.getConfigurationSection("rooms").getKeys(false)){
+                    int errorCheck = 0;
+                    if(bossRoomsConfig.get("rooms." + roomName + ".region")!=null){
+                        bRoomsRegions.put(roomName, String.valueOf(bossRoomsConfig.get("rooms."+roomName+".region")));
+                        errorCheck++;
+                    }
+                    if(bossRoomsConfig.get("rooms." + roomName + ".locations")!=null){
+                        Map<String, Map<String, Double>> locs = new HashMap<String, Map<String, Double>>();
+                        if(bossRoomsConfig.get("rooms." + roomName + ".locations.lobby")!=null){
+                            Map<String, Double> location = new HashMap<String, Double>();
+                            location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.x"));
+                            location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.y"));
+                            location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.z"));
+                            locs.put("lobby", location);
+                            bRoomsLocations.put(roomName, locs);
+                            errorCheck++;
+                        }
+                        if(bossRoomsConfig.get("rooms." + roomName + ".locations.spectate")!=null){
+                            Map<String, Double> location = new HashMap<String, Double>();
+                            location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.x"));
+                            location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.y"));
+                            location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.z"));
+                            locs.put("spectate", location);
+                            bRoomsLocations.put(roomName, locs);
+                            errorCheck++;
+                        }
+                        if(bossRoomsConfig.get("rooms." + roomName + ".locations.end")!=null){
+                            Map<String, Double> location = new HashMap<String, Double>();
+                            location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.x"));
+                            location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.y"));
+                            location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.z"));
+                            locs.put("end", location);
+                            bRoomsLocations.put(roomName, locs);
+                            errorCheck++;
+                        }
+                        if(bossRoomsConfig.get("rooms." + roomName + ".locations.spawn")!=null){
+                            Map<String, Double> location = new HashMap<String, Double>();
+                            location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.x"));
+                            location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.y"));
+                            location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.z"));
+                            locs.put("end", location);
+                            bRoomsLocations.put(roomName, locs);
+                            errorCheck++;
+                        }
+                    }
+                    //TODO put it into Format: Map<BossName, Map<BossRoomName, Map<x/y/z, values>>>
+                    if(bossRoomsConfig.get("rooms." + roomName + ".boss")!=null){
+                        if(bossRoomsConfig.get("rooms." + roomName + ".boss.type")!=null){
+                            if(bossRoomsConfig.get("rooms." + roomName + ".boss.spawnlocation")!=null){
+                                Map<String, Double> loc = new HashMap<String, Double>();
+                                loc.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.x"));
+                                loc.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.y"));
+                                loc.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.z"));
+                                Map<String, Map<String, Double>> bossLocation = new HashMap<String, Map<String, Double>>();
+                                bossLocation.put(roomName, loc);
+                            }
+                        }
+                    }
+
                 }
             }
+//            if (bossesConfig.get("locations") != null) {
+//                for (String bossName : bossesConfig.getConfigurationSection("locations").getKeys(false)) {
+//                    Map<String, Double> location = new HashMap<String, Double>();
+//                    location.put("x", bossesConfig.getDouble("locations." + bossName + ".x"));
+//                    location.put("y", bossesConfig.getDouble("locations." + bossName + ".y"));
+//                    location.put("z", bossesConfig.getDouble("locations." + bossName + ".z"));
+//                    bossesLocations.put(bossName.toLowerCase(), location);
+//                }
+//            }
         }
     }
 
