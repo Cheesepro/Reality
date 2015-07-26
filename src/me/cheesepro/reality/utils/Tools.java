@@ -60,4 +60,13 @@ public class Tools {
         return false;
     }
 
+    public boolean isInteger(String in){
+        try{
+            Integer.parseInt(in);
+        }catch (NumberFormatException e){
+            return false;
+        }
+        return true;
+    }
+
 }

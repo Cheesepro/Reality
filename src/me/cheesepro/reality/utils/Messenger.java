@@ -49,6 +49,10 @@ public class Messenger {
         Bukkit.broadcastMessage(prefix + " " + ChatColor.translateAlternateColorCodes('&', msg));
     }
 
+    public void noPermission(Player p){
+        send(p, "4", "Sorry, but you have insufficient permissions. ");
+    }
+
     private void color(String c)
     {
         if (c.equalsIgnoreCase("4")) {

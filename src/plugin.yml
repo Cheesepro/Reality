@@ -2,15 +2,17 @@
  version: 1.0
  description: Custom RPG for MineFutureMC
  author: Cheesepro
- website: http://MineFutureMC.com
+ website: http://RealityMC.com
  main: me.cheesepro.reality.Reality
- softdepend: [Vault]
+ depend: [Vault, WorldGuard, WorldEdit, PermissionsEX]
 
  commands:
    reality:
-     description: Reality admin commands
-     permission: reality.admin
+     description: Reality's main command
+     permission: reality.default
      permission-message: You don't have Permission!!
  permissions:
    reality.admin:
      default: op
+   reality.default:
+     defualt: true

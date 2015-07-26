@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.Map;
@@ -123,5 +124,21 @@ public class PlayerManager {
             }
         }
         return null;
+    }
+
+    public boolean hasDefaultPermission(Player p){
+        if(p.hasPermission("reality.default") || p.hasPermission("reality.admin")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean hasAdminPermission(Player p){
+        if(p.hasPermission("reality.admin")){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

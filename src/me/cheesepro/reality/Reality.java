@@ -1,5 +1,7 @@
 package me.cheesepro.reality;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.abilities.*;
 import me.cheesepro.reality.commands.CommandsManager;
 import me.cheesepro.reality.level.LevelLimiter;
@@ -18,6 +20,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -107,16 +110,16 @@ public class Reality extends JavaPlugin implements Listener{
     public static ItemStack crateKey = null;
 
     /*
-     * This map stores where the bosses located
-     * Format: Map<BossName, Map<BossRoomName, Map<x/y/z, values>>>
+     * This map stores what boss is in what room
+     * Format: Map<RoomName, BossName>
      */
-    public static Map<String, Map<String, Map<String, Double>>> bRoomsBosses = new HashMap<String, Map<String, Map<String, Double>>>();
+    public static Map<String, String> bRoomsBosses = new HashMap<String,String>();
 
     /*
-     * Stores Boss Rooms's regions names
-     * Format: Map<BossRoomName, RegionName>
+     * This map stores where the bosses located
+     * Format: Map<RoomName, Map<x/y/z, value>>
      */
-    public static Map<String, String> bRoomsRegions = new HashMap<String, String>();
+    public static Map<String, Map<String, Double>> bRoomsBossesLocations = new HashMap<String, Map<String, Double>>();
 
     /*
      * Stores lobby,spawn,end and spectate locations of boss rooms
@@ -134,6 +137,11 @@ public class Reality extends JavaPlugin implements Listener{
      * Stores the world where all the bosses will be allowed.
      */
     public static String bossesWorld = null;
+
+    /*
+     * Stores all the bossTypes
+     */
+    public static List<String> bossesTypes = new ArrayList<String>();
 
     Logger logger = new Logger();
     ConfigManager configManager;
@@ -157,6 +165,12 @@ public class Reality extends JavaPlugin implements Listener{
             registerCommands();
             registerListeners();
             registerAbilities();
+            if(getWorldEdit()==null){
+                logger.warn("WorldEdit dependency not found!");
+            }
+            if(getWorldGuard()==null){
+                logger.warn("WorldGuard dependency not found!");
+            }
             logger.info("Successfully Enabled");
         }catch (Exception e){
             logger.error(e);
@@ -396,14 +410,11 @@ public class Reality extends JavaPlugin implements Listener{
         crateKey.setItemMeta(im);
 
         if(bossRoomsConfig.get("world")!=null) {
+            int errorCheck = 0;
             bossesWorld = String.valueOf(bossRoomsConfig.get("world"));
+            errorCheck++;
             if(bossRoomsConfig.get("rooms")!=null){
                 for(String roomName : bossRoomsConfig.getConfigurationSection("rooms").getKeys(false)){
-                    int errorCheck = 0;
-                    if(bossRoomsConfig.get("rooms." + roomName + ".region")!=null){
-                        bRoomsRegions.put(roomName, String.valueOf(bossRoomsConfig.get("rooms."+roomName+".region")));
-                        errorCheck++;
-                    }
                     if(bossRoomsConfig.get("rooms." + roomName + ".locations")!=null){
                         Map<String, Map<String, Double>> locs = new HashMap<String, Map<String, Double>>();
                         if(bossRoomsConfig.get("rooms." + roomName + ".locations.lobby")!=null){
@@ -443,21 +454,47 @@ public class Reality extends JavaPlugin implements Listener{
                             errorCheck++;
                         }
                     }
-                    //TODO put it into Format: Map<BossName, Map<BossRoomName, Map<x/y/z, values>>>
+
                     if(bossRoomsConfig.get("rooms." + roomName + ".boss")!=null){
                         if(bossRoomsConfig.get("rooms." + roomName + ".boss.type")!=null){
+                            bRoomsBosses.put(roomName, String.valueOf(bossRoomsConfig.get("rooms." + roomName + ".boss.type")));
+                            errorCheck++;
                             if(bossRoomsConfig.get("rooms." + roomName + ".boss.spawnlocation")!=null){
                                 Map<String, Double> loc = new HashMap<String, Double>();
                                 loc.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.x"));
                                 loc.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.y"));
                                 loc.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.z"));
-                                Map<String, Map<String, Double>> bossLocation = new HashMap<String, Map<String, Double>>();
-                                bossLocation.put(roomName, loc);
+                                bRoomsBossesLocations.put(roomName, loc);
+                                errorCheck++;
                             }
                         }
                     }
 
+                    if(bossRoomsConfig.get("rooms."+ roomName + ".settings")!=null){
+                        Map<String, String> settings = new HashMap<String, String>();
+                        if(bossRoomsConfig.get("rooms."+ roomName + ".settings.maxplayers")!=null){
+                            settings.put("maxplayers", String.valueOf(bossRoomsConfig.get("rooms."+ roomName + ".settings.maxplayers")));
+                            errorCheck++;
+                        }
+                        if(bossRoomsConfig.get("rooms."+ roomName + ".settings.minplayers")!=null){
+                            settings.put("minplayers", String.valueOf(bossRoomsConfig.get("rooms."+ roomName + ".settings.minplayers")));
+                            errorCheck++;
+                        }
+                        if(bossRoomsConfig.get("rooms."+ roomName + ".settings.idletimeout")!=null){
+                            settings.put("idletimeout", String.valueOf(bossRoomsConfig.get("rooms."+ roomName + ".settings.idletimeout")));
+                            errorCheck++;
+                        }
+                        bRoomsSettings.put(roomName, settings);
+                    }
                 }
+                if(bRoomsBosses!=null){
+                    for(String room : bRoomsBosses.keySet()){
+                        bossesTypes.add(bRoomsBosses.get(room));
+                    }
+                }
+            }
+            if(errorCheck % 10 != 0){
+                logger.warn("Something went wrong when caching boss rooms configurations! Please check your config see if anything is missing or in the wrong format!");
             }
 //            if (bossesConfig.get("locations") != null) {
 //                for (String bossName : bossesConfig.getConfigurationSection("locations").getKeys(false)) {
@@ -470,6 +507,30 @@ public class Reality extends JavaPlugin implements Listener{
 //            }
         }
     }
+
+    public WorldEditPlugin getWorldEdit() {
+        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+
+        // WorldGuard may not be loaded
+        if (plugin == null || !(plugin instanceof WorldEditPlugin)) {
+            return null; // Maybe you want throw an exception instead
+        }
+
+        return (WorldEditPlugin) plugin;
+    }
+
+    public WorldGuardPlugin getWorldGuard() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+
+        // WorldGuard may not be loaded
+        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+            return null; // Maybe you want throw an exception instead
+        }
+
+        return (WorldGuardPlugin) plugin;
+    }
+
+
 
     public Map<String, Map<String, List<String>>> getRanks() {
         return ranks;
@@ -539,16 +600,32 @@ public class Reality extends JavaPlugin implements Listener{
         return abilities;
     }
 
-    public Config getBossesConfig(){
-        return bossesConfig;
+    public Config getBossRoomsConfig(){
+        return bossRoomsConfig;
     }
 
-    public Map<String, Map<String, Double>> getBossesLocations(){
-        return bossesLocations;
+    public Map<String, String> getbRoomsBosses() {
+        return bRoomsBosses;
+    }
+
+    public Map<String, Map<String, Double>> getbRoomsBossesLocations() {
+        return bRoomsBossesLocations;
+    }
+
+    public Map<String, Map<String, Map<String, Double>>> getbRoomsLocations() {
+        return bRoomsLocations;
+    }
+
+    public Map<String, Map<String, String>> getbRoomsSettings() {
+        return bRoomsSettings;
     }
 
     public String getBossesWorld(){
         return bossesWorld;
+    }
+
+    public List<String> getBossesTypes(){
+        return bossesTypes;
     }
 
 

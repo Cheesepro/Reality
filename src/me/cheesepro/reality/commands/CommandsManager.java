@@ -3,6 +3,7 @@ package me.cheesepro.reality.commands;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.Messenger;
+import me.cheesepro.reality.utils.PlayerManager;
 import me.cheesepro.reality.utils.Tools;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,32 +24,72 @@ public class CommandsManager implements CommandExecutor{
     List<String> cratesItems;
     Map<String, Map<String, Integer>> cratesLocations;
     Config cratesConfig;
+    PlayerManager pManager;
 
     CratesCommands cratesCommands;
+    BossesCommands bossesCommands;
 
     public CommandsManager(Reality plugin){
         this.plugin = plugin;
         msg = new Messenger(plugin);
         tools = new Tools(plugin);
+        pManager = new PlayerManager(plugin);
         cratesItems = plugin.getCratesItems();
         cratesLocations = plugin.getCratesLocations();
         cratesConfig = plugin.getCratesConfig();
+
         cratesCommands = new CratesCommands(plugin);
+        bossesCommands = new BossesCommands(plugin);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
         if(sender instanceof Player){
             Player p = (Player) sender;
             if(cmd.getLabel().equalsIgnoreCase("reality")){
-                if(args.length==2){
-                    if(args[0].equalsIgnoreCase("setcrate")){
-                        cratesCommands.commandSetCrate(p, args[1]);
-                    }else if(args[0].equalsIgnoreCase("removecrate")){
-                        cratesCommands.commandRemoveCrate(p, args[1]);
+                if(args.length==0){
+                    if(pManager.hasDefaultPermission(p)){
+
+                    }else if(pManager.hasAdminPermission(p)){
+
                     }
-                }else if(args.length==1 && args[0].equalsIgnoreCase("crateslist")){
-                    cratesCommands.commandCratesList(p);
-                }else {
+                }else if(args.length==1){
+                    if(pManager.hasDefaultPermission(p)){
+                        if(args[0].equalsIgnoreCase("crateslist")){
+                            cratesCommands.commandCratesList(p);
+                        }
+                    }else{
+                        msg.noPermission(p);
+                    }
+                }else if(args.length==2){
+                    if(pManager.hasAdminPermission(p)){
+                        if(args[0].equalsIgnoreCase("setcrate")){
+                            cratesCommands.commandSetCrate(p, args[1]);
+                        }else if(args[0].equalsIgnoreCase("removecrate")){
+                            cratesCommands.commandRemoveCrate(p, args[1]);
+                        }
+                    }else{
+                        msg.noPermission(p);
+                    }
+                }else if(args.length==3){
+                    if(args[0].equalsIgnoreCase("bossroom")){
+                        if(pManager.hasAdminPermission(p)){
+                            if(args[1].equalsIgnoreCase("create")){
+                                bossesCommands.commandCreate(p, args[2]);
+                            }else if(args[1].equalsIgnoreCase("set")){
+                                // Format: /reality bossroom set bRoomName [lobby/end/spawn] <bossName/amount/time>
+                                bossesCommands.commandSet(p, args[2], args[3], args[4]);
+                            }
+                        }else if(pManager.hasDefaultPermission(p)){
+                            if(args[1].equalsIgnoreCase("join")){
+                                bossesCommands.commandJoin(p, args[2]);
+                            }else if(args[1].equalsIgnoreCase("quit")){
+                                bossesCommands.commandQuit(p, args[2]);
+                            }
+                        }else{
+                            msg.noPermission(p);
+                        }
+                    }
+                }else{
                     msg.send(p, "a", "Type /reality for help");
                 }
             }
