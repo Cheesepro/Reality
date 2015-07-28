@@ -36,123 +36,129 @@ public class Reality extends JavaPlugin implements Listener{
      * The map that stores all the settings of the plugin.
      * Format: Map(Setting, List(value))
      */
-    public static Map<String, List<String>> settings = new HashMap<String, List<String>>();
+    public Map<String, List<String>> settings = new HashMap<String, List<String>>();
 
     /*
      * This map stores all the information about ranks such as the name, health, starting-kits and abilities of a rank.</b>
      * Format: (Rank name, Map(name/health/starting-kits/abilities, List(value)))
      */
-    public static Map<String, Map<String, List<String>>> ranks = new HashMap<String, Map<String, List<String>>>();
+    public Map<String, Map<String, List<String>>> ranks = new HashMap<String, Map<String, List<String>>>();
 
     /*
      * This map stores how much XP are each level needed.
      * Format: Map(Level, XP required)
      */
-    public static Map<String, Integer> levels = new HashMap<String, Integer>();
+    private Map<String, Integer> levels = new HashMap<String, Integer>();
 
     /*
      * This map stores all the items that each level are allowed.
      * Format: Map(Level, NavigableSet(AllowedItems))
      */
-    public static Map<String, NavigableSet<String>> levelLimits = new HashMap<String, NavigableSet<String>>();
+    private Map<String, NavigableSet<String>> levelLimits = new HashMap<String, NavigableSet<String>>();
 
     /*
      * This set contains all the blocked items.
      */
-    public static NavigableSet<String> blockedItems = new TreeSet<String>();
+    private NavigableSet<String> blockedItems = new TreeSet<String>();
 
     /*
      * This set contains all the levels
      */
-    public static NavigableSet<Integer> levelsSet = new TreeSet<Integer>();
+    private NavigableSet<Integer> levelsSet = new TreeSet<Integer>();
 
     /*
      * This map stores the information of every abilities
      * Format: Map(AbilityName, Map(item/item_name/cooldown, value))
      */
-    public static Map<String, Map<String, String>> abilitiesOptions = new HashMap<String, Map<String, String>>();
+    private Map<String, Map<String, String>> abilitiesOptions = new HashMap<String, Map<String, String>>();
 
     /*
      * This map stores all the configurable messages.
      */
-    public static Map<String, String> messages = new HashMap<String, String>();
+    private Map<String, String> messages = new HashMap<String, String>();
 
     /*
      * This map stores every player's information
      * Format: Map(UUID of the player, Map(rank/level/xp, value))
      */
-    public static Map<UUID, Map<String, String>> playersINFO = new HashMap<UUID, Map<String, String>>();
+    private Map<UUID, Map<String, String>> playersINFO = new HashMap<UUID, Map<String, String>>();
 
     /*
      * This array contains all the Abilities types.
      */
-    public static Abilities abilities[] = new Abilities[9];
+    private Abilities abilities[] = new Abilities[9];
 
     /*
      * This is the list that contains all the prizes in the crates
      */
-    public static List<String> cratesItems = new ArrayList<String>();
+    private List<String> cratesItems = new ArrayList<String>();
 
     /*
      * This map contains location information about crates
      * Format: Map(Name, Map(x/y/z, value))
      */
-    public static Map<String, Map<String, Integer>> cratesLocations = new HashMap<String, Map<String, Integer>>();
+    private Map<String, Map<String, Integer>> cratesLocations = new HashMap<String, Map<String, Integer>>();
 
     /*
      * Stores the world where all the crates are allowed to be create.
      */
-    public static String cratesWorld = null;
+    private String cratesWorld = null;
 
     /*
      * Stores the world where all the crates are allowed to be create.
      */
-    public static ItemStack crateKey = null;
+    private ItemStack crateKey = null;
 
     /*
      * This map stores what boss is in what room
      * Format: Map<RoomName, BossName>
      */
-    public static Map<String, String> bRoomsBosses = new HashMap<String,String>();
+    private Map<String, String> bRoomsBosses = new HashMap<String,String>();
 
     /*
      * This map stores where the bosses located
      * Format: Map<RoomName, Map<x/y/z, value>>
      */
-    public static Map<String, Map<String, Double>> bRoomsBossesLocations = new HashMap<String, Map<String, Double>>();
+    private Map<String, Map<String, Double>> bRoomsBossesLocations = new HashMap<String, Map<String, Double>>();
 
     /*
      * Stores lobby,spawn,end and spectate locations of boss rooms
      * Format: Map<BossRoomName, Map<lobby/spawn/end/spectate, Map<x/y/z, value>>>
      */
-    public static Map<String, Map<String, Map<String, Double>>> bRoomsLocations = new HashMap<String, Map<String, Map<String, Double>>>();
+    private Map<String, Map<String, Map<String, Double>>> bRoomsLocations = new HashMap<String, Map<String, Map<String, Double>>>();
 
     /*
      * Stores boss rooms maxplayer/minplayer/no action time out time
      * Format: Map<BossRoomName, Map<maxplayer/minplayer/no action time out time, value>>
      */
-    public static Map<String, Map<String, String>> bRoomsSettings = new HashMap<String, Map<String, String>>();
+    private Map<String, Map<String, String>> bRoomsSettings = new HashMap<String, Map<String, String>>();
 
     /*
      * Stores the world where all the bosses will be allowed.
      */
-    public static String bossesWorld = null;
+    private String bossesWorld = null;
 
     /*
      * Stores all the bossTypes
      */
-    public static List<String> bossesTypes = new ArrayList<String>();
+    private List<String> bossesTypes = new ArrayList<String>();
 
-    Logger logger = new Logger();
-    ConfigManager configManager;
-    Config ranksConfig;
-    Config levelsConfig;
-    Config msgConfig;
-    Config storageConfig;
-    Config abilitiesConfig;
-    Config cratesConfig;
-    Config bossRoomsConfig;
-    World world;
+    /*
+     * Stores either the boss room is enabled or not.
+     */
+    private Map<String, Boolean> bRoomsEnabled = new HashMap<String, Boolean>();
+
+    private Logger logger = new Logger();
+
+    private ConfigManager configManager;
+    private Config ranksConfig;
+    private Config levelsConfig;
+    private Config msgConfig;
+    private Config storageConfig;
+    private Config abilitiesConfig;
+    private Config cratesConfig;
+    private Config bossRoomsConfig;
+    private World world;
     public static String pName = "[Reality]";
     private final JavaPlugin plugin = this;
 
@@ -493,7 +499,7 @@ public class Reality extends JavaPlugin implements Listener{
                     }
                 }
             }
-            if(errorCheck % 10 != 0){
+            if(errorCheck!=10){
                 logger.warn("Something went wrong when caching boss rooms configurations! Please check your config see if anything is missing or in the wrong format!");
             }
 //            if (bossesConfig.get("locations") != null) {
@@ -628,5 +634,7 @@ public class Reality extends JavaPlugin implements Listener{
         return bossesTypes;
     }
 
-
+    public Map<String, Boolean> getbRoomsEnabled(){
+        return bRoomsEnabled;
+    }
 }

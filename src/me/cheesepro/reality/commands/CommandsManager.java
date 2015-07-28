@@ -78,6 +78,10 @@ public class CommandsManager implements CommandExecutor{
                             }else if(args[1].equalsIgnoreCase("set")){
                                 // Format: /reality bossroom set bRoomName [lobby/end/spawn] <bossName/amount/time>
                                 bossesCommands.commandSet(p, args[2], args[3], args[4]);
+                            }else if(args[1].equalsIgnoreCase("enable")){
+                                bossesCommands.commandEnable(p, args[2]);
+                            }else if(args[1].equalsIgnoreCase("remove") && args[1].equalsIgnoreCase("delete")){
+                                bossesCommands.commandRemove(p, args[1]);
                             }
                         }else if(pManager.hasDefaultPermission(p)){
                             if(args[1].equalsIgnoreCase("join")){

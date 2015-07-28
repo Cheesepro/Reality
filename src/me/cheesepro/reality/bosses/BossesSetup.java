@@ -28,7 +28,7 @@ public class BossesSetup {
 
     public BossesSetup(Reality plugin){
         this.plugin = plugin;
-        bossesLocations = plugin.getBossesLocations();
+        bossesLocations = plugin.getbRoomsBossesLocations();
         bossesWorld = plugin.getBossesWorld();
 
         bossChicken = new BossChicken(plugin);
