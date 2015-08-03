@@ -1,0 +1,41 @@
+world: world
+rooms:
+  test:
+    boss:
+      type: blaze
+      spawnlocation:
+        x: 240.69516919208948
+        y: 68.0
+        z: -107.86416534855285
+        pitch: 23.445187
+        yaw: 272.05988
+    locations:
+      lobby:
+        x: 239.69999998807907
+        y: 75.0
+        z: -108.04418282502353
+        pitch: 22.114067
+        yaw: 270.72803
+      end:
+        x: 235.2318292256002
+        y: 67.0
+        z: -107.37668376610841
+        pitch: 35.757835
+        yaw: 270.3955
+      spawn:
+        x: 252.69398794136941
+        y: 67.0
+        z: -107.40475473717419
+        pitch: 33.761192
+        yaw: 90.75952
+      spectate:
+        x: 246.69999998807907
+        y: 78.0
+        z: -107.51072389623249
+        pitch: 38.752735
+        yaw: 265.46606
+    settings:
+      maxplayers: 4
+      minplayers: 1
+      idletimeout: 60
+    enabled: true

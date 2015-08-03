@@ -70,24 +70,27 @@ public class CommandsManager implements CommandExecutor{
                     }else{
                         msg.noPermission(p);
                     }
-                }else if(args.length==3){
+                }else if(args.length>=3){
                     if(args[0].equalsIgnoreCase("bossroom")){
+                        if(pManager.hasDefaultPermission(p)){
+                            if(args[1].equalsIgnoreCase("buy")){
+                                bossesCommands.commandBuy(p, args[2]);
+                            }
+                        }
                         if(pManager.hasAdminPermission(p)){
                             if(args[1].equalsIgnoreCase("create")){
                                 bossesCommands.commandCreate(p, args[2]);
-                            }else if(args[1].equalsIgnoreCase("set")){
-                                // Format: /reality bossroom set bRoomName [lobby/end/spawn] <bossName/amount/time>
-                                bossesCommands.commandSet(p, args[2], args[3], args[4]);
+                            }else if(args[2].equalsIgnoreCase("set")){
+                                // Format: /reality bossroom bRoomName set [lobby/end/spawn] <bossName/amount/time>
+                                if(args.length==4){
+                                    bossesCommands.commandSet(p, args[1], args[3]);
+                                }else if(args.length==5){
+                                    bossesCommands.commandSet(p, args[1], args[3], args[4]);
+                                }
                             }else if(args[1].equalsIgnoreCase("enable")){
                                 bossesCommands.commandEnable(p, args[2]);
-                            }else if(args[1].equalsIgnoreCase("remove") && args[1].equalsIgnoreCase("delete")){
-                                bossesCommands.commandRemove(p, args[1]);
-                            }
-                        }else if(pManager.hasDefaultPermission(p)){
-                            if(args[1].equalsIgnoreCase("join")){
-                                bossesCommands.commandJoin(p, args[2]);
-                            }else if(args[1].equalsIgnoreCase("quit")){
-                                bossesCommands.commandQuit(p, args[2]);
+                            }else if(args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")){
+                                bossesCommands.commandRemove(p, args[2]);
                             }
                         }else{
                             msg.noPermission(p);

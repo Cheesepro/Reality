@@ -1,12 +1,13 @@
-package me.cheesepro.reality.bosses.types;
+package me.cheesepro.reality.bossrooms.bosses;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bosses.Bosses;
-import me.cheesepro.reality.bosses.BossesSetup;
+import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Spider;
+import org.bukkit.entity.Zombie;
 
 
 /**
@@ -15,18 +16,23 @@ import org.bukkit.entity.Spider;
 public class BossSpider implements Bosses {
 
     Reality plugin;
-    BossesSetup bossesSetup;
+    BossesAPI bossesAPI;
     String name = ChatColor.DARK_GRAY.toString() + "Spider";
     String skill = "Can freeze the player once in a while";
     Integer health = 50;
     Integer damage = 4;
     Integer rewardXP = 7000;
     Integer rewardKey = 3;
-    Integer rewardMoney = 7000;
+    Double rewardMoney = 7000.0;
 
     public BossSpider(Reality plugin){
         this.plugin = plugin;
-        bossesSetup = new BossesSetup(plugin);
+        bossesAPI = new BossesAPI(plugin);
+    }
+
+    @Override
+    public String getType(){
+        return "spider";
     }
 
     @Override
@@ -60,14 +66,19 @@ public class BossSpider implements Bosses {
     }
 
     @Override
-    public Integer getRewardMoney() {
+    public Double getRewardMoney() {
         return rewardMoney;
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
         Spider spider = loc.getWorld().spawn(loc, Spider.class);
-        bossesSetup.basicSetup(spider, name, health);
+        bossesAPI.basicSetup(spider, name, health);
+    }
+
+    public void spawn(Location loc){
+        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
+        bossesAPI.basicSetup(zombie, name, health);
     }
 }

@@ -8,6 +8,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
+import javax.xml.crypto.Data;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,11 +17,12 @@ import java.util.UUID;
  */
 public class PlayerManager {
 
-    Reality plugin;
-    Map<UUID, Map<String, String>> playersINFO;
-    Map<String, Integer> levels;
-    Config storageConfig;
-    Messenger msg;
+    private Reality plugin;
+    private Map<UUID, Map<String, String>> playersINFO;
+    private Map<String, Integer> levels;
+    private Config storageConfig;
+    private Messenger msg;
+    private DataManager dataManager;
 
     public PlayerManager(Reality plugin){
         this.plugin = plugin;
@@ -28,6 +30,7 @@ public class PlayerManager {
         storageConfig = plugin.getStorageConfig();
         levels = plugin.getLevels();
         msg = new Messenger(plugin);
+        dataManager = new DataManager(plugin);
     }
 
     public String getRank(UUID id){
@@ -78,7 +81,7 @@ public class PlayerManager {
     public void addXP(UUID id, int xp){
         if(playersINFO.get(id)!=null){
             if(getLevel(id)==99){
-                //TODO add money (vault) support
+                dataManager.depositPlayer(Bukkit.getPlayer(id), xp+0.0);
                 msg.send(Bukkit.getPlayer(id), "e", "You earned $" + xp);
             }
             storageConfig.set("players."+id.toString()+".xp", Integer.parseInt(playersINFO.get(id).get("xp"))+xp);
@@ -86,6 +89,14 @@ public class PlayerManager {
             Map<String, String> cache = playersINFO.get(id);
             cache.put("xp", String.valueOf(Integer.parseInt(playersINFO.get(id).get("xp"))+xp));
             playersINFO.put(id, cache);
+            if(levelUp(id)!=null){
+                String returnResult = levelUp(id);
+                if(returnResult.startsWith("no")){
+                    String[] splits = returnResult.split("#");
+                    String next = splits[1];
+                    msg.send(Bukkit.getPlayer(id), "a", splits[0].replace("no", "")+" more XP to level " + next);
+                }
+            }
         }
     }
 

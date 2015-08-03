@@ -1,12 +1,13 @@
-package me.cheesepro.reality.bosses.types;
+package me.cheesepro.reality.bossrooms.bosses;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bosses.Bosses;
-import me.cheesepro.reality.bosses.BossesSetup;
+import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Zombie;
 
 
 /**
@@ -15,18 +16,23 @@ import org.bukkit.entity.Enderman;
 public class BossEnderman implements Bosses {
 
     Reality plugin;
-    BossesSetup bossesSetup;
+    BossesAPI bossesAPI;
     String name = ChatColor.LIGHT_PURPLE.toString() + "Enderman";
-    String skill = "Once the boss is at 50% health, he will clone himself so that there are 2 bosses to kill with 25% of health each.";
+    String skill = "Once the boss is at 50% health, he will clone himself so that there are 2 bossrooms to kill with 25% of health each.";
     Integer health = 50;
     Integer damage = 4;
     Integer rewardXP = 5000;
     Integer rewardKey = 2;
-    Integer rewardMoney = 5000;
+    Double rewardMoney = 5000.0;
 
     public BossEnderman(Reality plugin){
         this.plugin = plugin;
-        bossesSetup = new BossesSetup(plugin);
+        bossesAPI = new BossesAPI(plugin);
+    }
+
+    @Override
+    public String getType(){
+        return "enderman";
     }
 
     @Override
@@ -60,14 +66,19 @@ public class BossEnderman implements Bosses {
     }
 
     @Override
-    public Integer getRewardMoney() {
+    public Double getRewardMoney() {
         return rewardMoney;
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
         Enderman enderman = loc.getWorld().spawn(loc, Enderman.class);
-        bossesSetup.basicSetup(enderman, name, health);
+        bossesAPI.basicSetup(enderman, name, health);
+    }
+
+    public void spawn(Location loc){
+        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
+        bossesAPI.basicSetup(zombie, name, health);
     }
 }

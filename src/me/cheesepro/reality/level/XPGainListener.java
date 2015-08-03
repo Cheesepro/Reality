@@ -53,73 +53,50 @@ public class XPGainListener implements Listener{
                 if(!(e instanceof Player)){
                     if (e instanceof Bat){
                         pManager.addXP(id, 2);
-                        levelUP(id, p);
                     }else if (e instanceof Chicken){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Cow){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Pig){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Rabbit){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Sheep){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Squid){
                         pManager.addXP(id, 3);
-                        levelUP(id, p);
                     }else if (e instanceof Villager){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof CaveSpider){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof Enderman){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof Spider){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof PigZombie){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof Blaze){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof Creeper){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof Guardian){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof Endermite){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof Ghast){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof MagmaCube){
                         pManager.addXP(id, 8);
-                        levelUP(id, p);
                     }else if (e instanceof Silverfish){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Skeleton){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof Slime){
                         pManager.addXP(id, 4);
-                        levelUP(id, p);
                     }else if (e instanceof Witch){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }else if (e instanceof Zombie){
                         pManager.addXP(id, 16);
-                        levelUP(id, p);
                     }
                     Bukkit.getServer().getPluginManager().callEvent(new PlayerKillMobEvent(p, e));
                 }else{
@@ -141,48 +118,30 @@ public class XPGainListener implements Listener{
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.COAL, rNum));
             pManager.addXP(id, 1);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.LAPIS_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.INK_SACK, 1, (short) 4));
             pManager.addXP(id, 3);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.IRON_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, 1));
             pManager.addXP(id, 3);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.REDSTONE_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.REDSTONE, rNum));
             pManager.addXP(id, 5);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.GOLD_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, 1));
             pManager.addXP(id, 8);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.DIAMOND_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.DIAMOND, rNum));
             pManager.addXP(id, 10);
-            levelUP(id, p);
         }else if(e.getBlock().getType()== Material.EMERALD_ORE){
             e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
             p.getInventory().addItem(new ItemStack(Material.EMERALD, rNum));
             pManager.addXP(id, 15);
-            levelUP(id, p);
-        }
-    }
-
-    private void levelUP(UUID id, Player p){
-        if(pManager.levelUp(id)!=null){
-            String returnResult = pManager.levelUp(id);
-            if(returnResult.startsWith("no")){
-                String[] splits = returnResult.split("#");
-                String next = splits[1];
-                msg.send(p, "a", splits[0].replace("no", "")+" more XP to level " + next);
-            }
         }
     }
 

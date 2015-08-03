@@ -1,12 +1,13 @@
-package me.cheesepro.reality.bosses.types;
+package me.cheesepro.reality.bossrooms.bosses;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bosses.Bosses;
-import me.cheesepro.reality.bosses.BossesSetup;
+import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Zombie;
 
 
 /**
@@ -14,19 +15,23 @@ import org.bukkit.entity.Chicken;
  */
 public class BossChicken implements Bosses{
 
-    Reality plugin;
-    BossesSetup bossesSetup;
+    Reality plugin = Reality.getPlugin();
+    BossesAPI bossesAPI = new BossesAPI(plugin);
     String name = ChatColor.WHITE.toString() + "Chicken";
     String skill = "None!";
     Integer health = 50;
     Integer damage = 4;
     Integer rewardXP = 1000;
     Integer rewardKey = 1;
-    Integer rewardMoney = 1000;
+    Double rewardMoney = 1000.0;
 
     public BossChicken(Reality plugin){
         this.plugin = plugin;
-        bossesSetup = new BossesSetup(plugin);
+    }
+
+    @Override
+    public String getType(){
+        return "chicken";
     }
 
     @Override
@@ -38,7 +43,6 @@ public class BossChicken implements Bosses{
     public String getSkills() {
         return skill;
     }
-
 
     @Override
     public Integer getHealth() {
@@ -61,16 +65,21 @@ public class BossChicken implements Bosses{
     }
 
     @Override
-    public Integer getRewardMoney() {
+    public Double getRewardMoney() {
         return rewardMoney;
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
         Chicken chicken = loc.getWorld().spawn(loc, Chicken.class);
         chicken.setBreed(false);
         chicken.setAgeLock(true);
-        bossesSetup.basicSetup(chicken, name, health);
+        bossesAPI.basicSetup(chicken, name, health);
+    }
+
+    public void spawn(Location loc){
+        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
+        bossesAPI.basicSetup(zombie, name, health);
     }
 }

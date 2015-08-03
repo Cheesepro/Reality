@@ -2,7 +2,9 @@ package me.cheesepro.reality.luckycrates;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.eventhandlers.PlayerOpenCrateEvent;
+import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
+import me.cheesepro.reality.utils.PlayerManager;
 import me.cheesepro.reality.utils.Tools;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.xml.crypto.Data;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +27,16 @@ import java.util.Map;
  */
 public class LuckyCrates implements Listener {
 
-    Reality plugin;
-    Messenger msg;
-    Tools tools;
-    List<String> cratesItems;
-    Map<String, Map<String, Integer>> cratesLocations;
-    String cratesWorld;
-    ItemStack crateKey;
+    private Reality plugin;
+    private Messenger msg;
+    private Tools tools;
+    private List<String> cratesItems;
+    private Map<String, Map<String, Integer>> cratesLocations;
+    private String cratesWorld;
+    private ItemStack crateKey;
     private Inventory inv;
+    private DataManager dataManager;
+    private PlayerManager pManager;
 
     public LuckyCrates(Reality plugin) {
         this.plugin = plugin;
@@ -41,6 +46,8 @@ public class LuckyCrates implements Listener {
         cratesLocations = plugin.getCratesLocations();
         cratesWorld = plugin.getCratesWorld();
         crateKey = plugin.getCrateKey();
+        dataManager = new DataManager(plugin);
+        pManager = new PlayerManager(plugin);
         inv = Bukkit.getServer().createInventory(null, 54, ChatColor.GOLD.toString() + ChatColor.BOLD + "Lucky Crate");
         int value = 0;
         for (String itemInfo : cratesItems) {
@@ -123,7 +130,8 @@ public class LuckyCrates implements Listener {
                 }
             }
             if (got == 0) {
-                //TODO give xp and vault money support.
+                dataManager.depositPlayer((Player) e.getWhoClicked(), 5000.0);
+                pManager.addXP(e.getWhoClicked().getUniqueId(), 5000);
                 msg.send((Player) e.getWhoClicked(), "e", "You got $5000 and 5000XP");
             }
             if (e.getWhoClicked().getInventory().getItemInHand().getAmount() == 1) {

@@ -9,16 +9,21 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.BossesAPI;
+import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
 import me.cheesepro.reality.utils.Tools;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,15 +31,17 @@ import java.util.Map;
  */
 public class BossesCommands {
 
-    Reality plugin;
-    Messenger msg;
+    private Reality plugin;
+    private Messenger msg;
     private Config bossRoomsConfig;
     private DataManager dataManager;
-    String bossesWorld;
-    Tools tools;
+    private String bossesWorld;
+    private Tools tools;
 
-    WorldEditPlugin worldEdit;
-    WorldGuardPlugin worldGuard;
+    private Inventory invBuyMain;
+
+    private WorldEditPlugin worldEdit;
+    private WorldGuardPlugin worldGuard;
 
     public BossesCommands(Reality plugin){
         this.plugin = plugin;
@@ -45,13 +52,128 @@ public class BossesCommands {
         tools = new Tools(plugin);
         dataManager = new DataManager(plugin);
         bossRoomsConfig = plugin.getBossRoomsConfig();
+        BossesAPI bossesAPI = new BossesAPI(plugin);
+        BRoomManager bRoomManager = new BRoomManager(plugin);
+
+        invBuyMain = Bukkit.getServer().createInventory(null, 54, ChatColor.DARK_PURPLE.toString() + ChatColor.BOLD + "Boss room shop!");
+        int slot = 0;
+        for(String bRoom : dataManager.getBRooms()){
+            String bossType = bRoomManager.getBRoom(bRoom).getBossType();
+            ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+            SkullMeta meta = (SkullMeta) skull.getItemMeta();
+            meta.setOwner("MHF_" +bRoomManager.getBRoom(bRoom).getBossType());
+            meta.setDisplayName(ChatColor.YELLOW.toString()+ChatColor.STRIKETHROUGH+"---------"+ChatColor.YELLOW+"["+ChatColor.BLUE+"INFO"+ChatColor.YELLOW.toString()+"]"+ChatColor.STRIKETHROUGH+"---------");
+            List<String> lore = new ArrayList<String>();
+            lore.add(ChatColor.GOLD.toString() + "Room name: " + ChatColor.LIGHT_PURPLE + bRoom);
+            lore.add(ChatColor.GOLD.toString() + "Boss: "+ ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getName());
+            lore.add(ChatColor.GOLD.toString() + "Boss Health: "+ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getHealth());
+            lore.add(ChatColor.GOLD.toString() + "Boss Damage: "+ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getDamage());
+            lore.add(ChatColor.GOLD.toString() + "Room Status: "+ChatColor.LIGHT_PURPLE + bRoomManager.getBRoom(bRoom).getState());
+            lore.add(ChatColor.GOLD.toString() + "Slots: " +ChatColor.LIGHT_PURPLE +  bRoomManager.getBRoom(bRoom).getCurrentPlayers()+"/" + bRoomManager.getBRoom(bRoom).getMaxPlayer());
+            lore.add(ChatColor.GOLD.toString() + "Cost: "+ChatColor.LIGHT_PURPLE+"$"+bossesAPI.getBoss(bossType).getRewardMoney()*3);
+            lore.add(ChatColor.YELLOW.toString()+ChatColor.STRIKETHROUGH+"--------"+ ChatColor.YELLOW +"["+ChatColor.RED+"Rewards"+ChatColor.YELLOW.toString()+"]"+ChatColor.STRIKETHROUGH+"-------");
+            lore.add(ChatColor.GREEN + "Lucky Crate Key(s): " + ChatColor.AQUA + bossesAPI.getBoss(bossType).getRewardKey());
+            lore.add(ChatColor.GREEN + "Money: " + ChatColor.AQUA +"$"+bossesAPI.getBoss(bossType).getRewardMoney());
+            lore.add(ChatColor.GREEN + "XP: " + ChatColor.AQUA + bossesAPI.getBoss(bossType).getRewardXP());
+            lore.add(ChatColor.YELLOW.toString()+ChatColor.STRIKETHROUGH+"------------------------");
+            meta.setLore(lore);
+            skull.setItemMeta(meta);
+            invBuyMain.setItem(slot, skull);
+        }
+    }
+
+    //TODO CREATE a boss room information change eventhandlers and place the activator in the BRoom.java and trigger the event to update the inventory above
+
+    public void commandSet(Player p, String bRoom, String option){
+        if(dataManager.isBRoomValid(bRoom)) {
+            Location loc = p.getLocation();
+            Double x = loc.getX();
+            Double y = loc.getY();
+            Double z = loc.getZ();
+            Double pitch = Double.parseDouble(String.valueOf(loc.getPitch()));
+            Double yaw = Double.parseDouble(String.valueOf(loc.getYaw()));
+            Map<String, Map<String, Double>> locations = new HashMap<String, Map<String, Double>>();
+            Map<String, Double> tempLoc = new HashMap<String, Double>();
+            if(option.equalsIgnoreCase("lobby")){
+                tempLoc.clear();
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.x", x);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.y", y);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.z", z);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.pitch", pitch);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.yaw", yaw);
+                tempLoc.put("x", x);
+                tempLoc.put("y", y);
+                tempLoc.put("z", z);
+                tempLoc.put("pitch", pitch);
+                tempLoc.put("yaw", yaw);
+                locations.put("lobby", tempLoc);
+                msg.send(p, "a", "Lobby location set for room " +bRoom);
+            }else if(option.equalsIgnoreCase("end")){
+                tempLoc.clear();
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.end.x", x);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.end.y", y);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.end.z", z);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.end.pitch", pitch);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.end.yaw", yaw);
+                tempLoc.put("x", x);
+                tempLoc.put("y", y);
+                tempLoc.put("z", z);
+                tempLoc.put("pitch", pitch);
+                tempLoc.put("yaw", yaw);
+                locations.put("end", tempLoc);
+                msg.send(p, "a", "End location set for room " + bRoom);
+            }else if(option.equalsIgnoreCase("spawn")){
+                tempLoc.clear();
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spawn.x", x);
+                bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.y", y);
+                bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.z", z);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spawn.pitch", pitch);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spawn.yaw", yaw);
+                tempLoc.put("x", x);
+                tempLoc.put("y", y);
+                tempLoc.put("z", z);
+                tempLoc.put("pitch", pitch);
+                tempLoc.put("yaw", yaw);
+                locations.put("spawn", tempLoc);
+                msg.send(p, "a", "Spawn location set for room " + bRoom);
+            }else if(option.equalsIgnoreCase("spectate")){
+                tempLoc.clear();
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spectate.x", x);
+                bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.y", y);
+                bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.z", z);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spectate.pitch", pitch);
+                bossRoomsConfig.set("rooms." + bRoom + ".locations.spectate.yaw", yaw);
+                tempLoc.put("x", x);
+                tempLoc.put("y", y);
+                tempLoc.put("z", z);
+                tempLoc.put("pitch", pitch);
+                tempLoc.put("yaw", yaw);
+                locations.put("spectate", tempLoc);
+                msg.send(p, "a", "Spectate location set for room " + bRoom);
+            }else if(option.equalsIgnoreCase("bosslocation")){
+                tempLoc.clear();
+                bossRoomsConfig.set("rooms." + bRoom + ".boss.spawnlocation.x", x);
+                bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.y", y);
+                bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.z", z);
+                bossRoomsConfig.set("rooms." + bRoom + ".boss.spawnlocation.pitch", pitch);
+                bossRoomsConfig.set("rooms." + bRoom + ".boss.spawnlocation.yaw", yaw);
+                tempLoc.put("x", x);
+                tempLoc.put("y", y);
+                tempLoc.put("z", z);
+                tempLoc.put("pitch", pitch);
+                tempLoc.put("yaw", yaw);
+                locations.put("bosslocation", tempLoc);
+                msg.send(p, "a", "Boss spawn location set for room " + bRoom);
+            }
+            dataManager.setBRoomsLocations(bRoom, locations);
+            bossRoomsConfig.saveConfig();
+        }
     }
 
     public void commandSet(Player p, String bRoom, String option, String value){
         if(dataManager.isBRoomValid(bRoom)){
-            if(value!=null){
                 Map<String, String> settingsCache;
-                if(dataManager.getBRoomsSettings(bRoom)!=null){
+                if(dataManager.isBRoomsSettingsValid(bRoom)){
                     settingsCache = dataManager.getBRoomsSettings(bRoom);
                 }else{
                     settingsCache = new HashMap<String, String>();
@@ -60,81 +182,29 @@ public class BossesCommands {
                     if(dataManager.isBossValid(value)){
                         bossRoomsConfig.set("rooms."+bRoom+".boss.type", value);
                         bossRoomsConfig.saveConfig();
-                        dataManager.setBRoomsBosses(bRoom, value);
+                        dataManager.setBRoomsBosse(bRoom, value);
+                        msg.send(p, "a", "Boss type successfully set for room " + bRoom);
                     }else{
                         msg.send(p, "5", "Boss " + value + " is not valid!");
                     }
                 }else if(option.equalsIgnoreCase("idletimeout")){
                     if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms." + bRoom + ".settings.idletimeout", value);
+                    bossRoomsConfig.set("rooms." + bRoom + ".settings.idletimeout", Integer.parseInt(value));
                     settingsCache.put("idletimeout", value);
+                    msg.send(p, "a", "Idle timeout set for room " + bRoom);
                 }else if(option.equalsIgnoreCase("maxplayers")){
                     if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms."+bRoom+".settings.maxplayers", value);
+                    bossRoomsConfig.set("rooms." + bRoom + ".settings.maxplayers", Integer.parseInt(value));
                     settingsCache.put("maxplayers", value);
+                    msg.send(p, "a", "Max players limit set for room " + bRoom);
                 }else if(option.equalsIgnoreCase("minplayers")){
                     if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms."+bRoom+".settings.minplayers", value);
+                    bossRoomsConfig.set("rooms." + bRoom + ".settings.minplayers", Integer.parseInt(value));
                     settingsCache.put("minplayers", value);
+                    msg.send(p, "a", "Min players limit set for room " + bRoom);
                 }
                 bossRoomsConfig.saveConfig();
                 dataManager.setBRoomsSettings(bRoom, settingsCache);
-            }else{
-                Location loc = p.getLocation();
-                Double x = loc.getX();
-                Double y = loc.getY();
-                Double z = loc.getZ();
-                Map<String, Map<String, Double>> locations = new HashMap<String, Map<String, Double>>();
-                Map<String, Double> tempLoc = new HashMap<String, Double>();
-                if(option.equalsIgnoreCase("lobby")){
-                    tempLoc.clear();
-                    bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.x", x);
-                    bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.y", y);
-                    bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.z", z);
-                    tempLoc.put("x", x);
-                    tempLoc.put("y", y);
-                    tempLoc.put("z", z);
-                    locations.put("lobby", tempLoc);
-                }else if(option.equalsIgnoreCase("end")){
-                    tempLoc.clear();
-                    bossRoomsConfig.set("rooms." + bRoom + ".locations.end.x", x);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.end.y", y);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.end.z", z);
-                    tempLoc.put("x", x);
-                    tempLoc.put("y", y);
-                    tempLoc.put("z", z);
-                    locations.put("end", tempLoc);
-                }else if(option.equalsIgnoreCase("spawn")){
-                    tempLoc.clear();
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.x", x);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.y", y);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.z", z);
-                    tempLoc.put("x", x);
-                    tempLoc.put("y", y);
-                    tempLoc.put("z", z);
-                    locations.put("spawn", tempLoc);
-                }else if(option.equalsIgnoreCase("spectate")){
-                    tempLoc.clear();
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.x", x);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.y", y);
-                    bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.z", z);
-                    tempLoc.put("x", x);
-                    tempLoc.put("y", y);
-                    tempLoc.put("z", z);
-                    locations.put("spectate", tempLoc);
-                }else if(option.equalsIgnoreCase("bosslocation")){
-                    tempLoc.clear();
-                    bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.x", x);
-                    bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.y", y);
-                    bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.z", z);
-                    tempLoc.put("x", x);
-                    tempLoc.put("y", y);
-                    tempLoc.put("z", z);
-                    locations.put("bosslocation", tempLoc);
-                }
-                dataManager.setBRoomsLocations(bRoom, locations);
-                bossRoomsConfig.saveConfig();
-            }
         }else{
             msg.send(p, "4", "Boss Room " + bRoom + " does not exist! Type /reality bossroom create " + bRoom + " to create it!");
         }
@@ -196,56 +266,74 @@ public class BossesCommands {
                 }else{
                     msg.send(p, "e", "Boss type: " + ChatColor.RED + "NULL");
                 }
-                if(dataManager.getBRoomsBossesLocations(bRoom)!=null){
+                if(dataManager.isBRoomsBossesLocationsValid(bRoom)){
                     check++;
                     msg.send(p, "e", "Boss spawn location: " + ChatColor.GREEN + "SET");
                 }else{
                     msg.send(p, "e", "Boss spawn location: " + ChatColor.RED + "NULL");
                 }
-                if(dataManager.getBRoomsLocations(bRoom).get("lobby")!=null){
-                    check++;
-                    msg.send(p, "e", "Lobby location: " + ChatColor.GREEN + "SET");
+                if(dataManager.isBRoomsLocationsValid(bRoom)){
+                    if(dataManager.getBRoomsLocations(bRoom).containsKey("lobby")){
+                        check++;
+                        msg.send(p, "e", "Lobby location: " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Lobby location: " + ChatColor.RED + "NULL");
+                    }
+                    if(dataManager.getBRoomsLocations(bRoom).containsKey("spectate")){
+                        check++;
+                        msg.send(p, "e", "Spectate location: " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Spectate location: " + ChatColor.RED + "NULL");
+                    }
+                    if(dataManager.getBRoomsLocations(bRoom).containsKey("end")){
+                        check++;
+                        msg.send(p, "e", "End location: " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "End location: " + ChatColor.RED + "NULL");
+                    }
+                    if(dataManager.getBRoomsLocations(bRoom).containsKey("spawn")){
+                        check++;
+                        msg.send(p, "e", "Spawn location: " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Spawn location: " + ChatColor.RED + "NULL");
+                    }
                 }else{
                     msg.send(p, "e", "Lobby location: " + ChatColor.RED + "NULL");
-                }
-                if(dataManager.getBRoomsLocations(bRoom).get("spectate")!=null){
-                    check++;
-                    msg.send(p, "e", "Spectate location: " + ChatColor.GREEN + "SET");
-                }else{
                     msg.send(p, "e", "Spectate location: " + ChatColor.RED + "NULL");
-                }
-                if(dataManager.getBRoomsLocations(bRoom).get("end")!=null){
-                    check++;
-                    msg.send(p, "e", "End location: " + ChatColor.GREEN + "SET");
-                }else{
                     msg.send(p, "e", "End location: " + ChatColor.RED + "NULL");
-                }
-                if(dataManager.getBRoomsLocations(bRoom).get("spawn")!=null){
-                    check++;
-                    msg.send(p, "e", "Spawn location: " + ChatColor.GREEN + "SET");
-                }else{
                     msg.send(p, "e", "Spawn location: " + ChatColor.RED + "NULL");
                 }
-                if(dataManager.getBRoomsSettings(bRoom).get("maxplayers")!=null){
-                    check++;
-                    msg.send(p, "e", "Maximum player(s): " + ChatColor.GREEN + "SET");
+                if(dataManager.isBRoomsSettingsValid(bRoom)){
+                    if(dataManager.getBRoomsSettings(bRoom).containsKey("maxplayers")){
+                        check++;
+                        msg.send(p, "e", "Maximum player(s): " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Maximum player(s): " + ChatColor.RED + "NULL");
+                    }
+                    if(dataManager.getBRoomsSettings(bRoom).containsKey("minplayers")){
+                        check++;
+                        msg.send(p, "e", "Minimum player(s): " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Minimum player(s): " + ChatColor.RED + "NULL");
+                    }
+                    if(dataManager.getBRoomsSettings(bRoom).containsKey("idletimeout")){
+                        check++;
+                        msg.send(p, "e", "Player idle timeout: " + ChatColor.GREEN + "SET");
+                    }else{
+                        msg.send(p, "e", "Player idle timeout: " + ChatColor.RED + "NULL");
+                    }
                 }else{
                     msg.send(p, "e", "Maximum player(s): " + ChatColor.RED + "NULL");
-                }
-                if(dataManager.getBRoomsSettings(bRoom).get("minplayers")!=null){
-                    check++;
-                    msg.send(p, "e", "Minimum player(s): " + ChatColor.GREEN + "SET");
-                }else{
                     msg.send(p, "e", "Minimum player(s): " + ChatColor.RED + "NULL");
-                }
-                if(dataManager.getBRoomsSettings(bRoom).get("idletimeout")!=null){
-                    check++;
-                    msg.send(p, "e", "Player idle timeout: " + ChatColor.GREEN + "SET");
-                }else{
                     msg.send(p, "e", "Player idle timeout: " + ChatColor.RED + "NULL");
                 }
+
                 if(check==9){
+                    bossRoomsConfig.set("rooms." + bRoom + ".enabled", true);
+                    bossRoomsConfig.saveConfig();
                     dataManager.setBRoomEnabled(bRoom, true);
+                    msg.send(p, "a", "Room " + bRoom + " enabled!");
+                    //TODO fix locations enable error
                 }
             }else{
                 msg.send(p, "a", "Room " + bRoom + " is already enabled.");
@@ -256,16 +344,30 @@ public class BossesCommands {
     }
 
     public void commandRemove(Player p, String bRoom){
-
+        dataManager.removeBRoom(bRoom);
+        worldGuard.getRegionManager(Bukkit.getWorld(bossesWorld)).removeRegion("reality_bossroom_"+bRoom);
+        msg.send(p, "d", "Room " + bRoom + " removing action complete.");
     }
 
-    public void commandJoin(Player p, String bRoom){
-
+    public void commandBuy(Player p, String bRoom){
+        if(bRoom.equalsIgnoreCase("menu")){
+            p.openInventory(invBuyMain);
+        }else{
+            //TODO add boss room purchase features both command and gui
+        }
     }
 
-    public void commandQuit(Player p, String bRoom){
-
-    }
+//    public void commandJoin(Player p, String bRoom){
+//        if(bRoomManager.getBRoom(p)==null){
+//
+//        }else{
+//            msg.send(p, "c", "You are already in a Boss Room!");
+//        }
+//    }
+//
+//    public void commandQuit(Player p, String bRoom){
+//
+//    }
 
 
 }

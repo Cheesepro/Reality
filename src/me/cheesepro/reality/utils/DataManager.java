@@ -1,6 +1,11 @@
 package me.cheesepro.reality.utils;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.Bosses;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -10,7 +15,7 @@ import java.util.*;
  */
 public class DataManager {
 
-    private Reality plugin;
+    private Reality plugin = Reality.getPlugin();
     private Map<String, List<String>> settings;
     private Map<String, Map<String, List<String>>> ranks;
     private Map<String, Integer> levels;
@@ -29,13 +34,21 @@ public class DataManager {
     private Map<String, Map<String, Map<String, Double>>> bRoomsLocations;
     private Map<String, Map<String, String>> bRoomsSettings;
     private String bossesWorld;
-    private List<String> bossesTypes;
+    private Set<String> bossesTypes;
     private Map<String, Boolean> bRoomsEnabled;
+    private Map<UUID, Boolean> bRoomPlayersRole;
+    private Map<UUID, String> bRoomPlayersRoom;
+    private Map<String, Integer> bRoomWinCount;
+
+    Bosses[] bosses;
+
+    private WorldGuardPlugin worldGuard;
 
     private Config storageConfig;
     private Config cratesConfig;
     private Config bossRoomsConfig;
 
+    private Economy economy = Reality.getEconomy();
 
     public DataManager(Reality plugin){
         this.plugin = plugin;
@@ -59,15 +72,28 @@ public class DataManager {
         playersINFO = plugin.getPlayersINFO();
         ranks = plugin.getRanks();
         settings = plugin.getSettings();
+        bRoomPlayersRole = plugin.getbRoomPlayersRole();
+        bRoomPlayersRoom = plugin.getbRoomPlayersRoom();
+        bRoomWinCount = plugin.getbRoomWinCount();
+        worldGuard = plugin.getWorldGuard();
+        bosses = plugin.getBosses();
 
         storageConfig = plugin.getStorageConfig();
         cratesConfig = plugin.getCratesConfig();
         bossRoomsConfig = plugin.getBossRoomsConfig();
     }
 
+    public String getBossesWorld(){
+        return bossesWorld;
+    }
+
     public Boolean isBRoomEnabled(String bRoom){
-        if(bRoomsEnabled.get(bRoom)){
-            return true;
+        if(bRoomsEnabled!=null && !bRoomsEnabled.toString().equalsIgnoreCase("{}")){
+            if(bRoomsEnabled.containsKey(bRoom)){
+                if(bRoomsEnabled.get(bRoom)){
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -82,24 +108,45 @@ public class DataManager {
         bRoomsBossesLocations.remove(bRoom);
         bRoomsLocations.remove(bRoom);
         bRoomsSettings.remove(bRoom);
-        bossRoomsConfig.set(bRoom, null);
+        bossRoomsConfig.set("rooms."+bRoom, null);
         bossRoomsConfig.saveConfig();
     }
 
-    public Boolean isBossValid(String boss){
-        return bossesTypes.contains(boss);
+    public Boolean isBossValid(String boss) {
+        for (Bosses bossType : bosses) {
+            if(bossType.getType().equalsIgnoreCase(boss)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Set<String> getBossesTypes(){
+        return bossesTypes;
     }
 
     public Boolean isBRoomValid(String bRoom){
-        return bRoomsBosses.keySet().contains(bRoom);
+        return worldGuard.getRegionManager(Bukkit.getWorld(bossesWorld)).hasRegion("reality_bossroom_"+bRoom);
     }
 
-    public void setBRoomsBosses(String key, String value){
+    public String getBRoomBoss(String key){
+        return bRoomsBosses.get(key);
+    }
+
+    public void setBRoomsBosse(String key, String value){
         bRoomsBosses.put(key, value);
+    }
+
+    public Set<String> getBRooms(){
+        return bRoomsEnabled.keySet();
     }
 
     public Map<String, String> getBRoomsSettings(String key){
         return bRoomsSettings.get(key);
+    }
+
+    public Boolean isBRoomsSettingsValid(String key){
+        return bRoomsSettings.containsKey(key);
     }
 
     public void setBRoomsSettings(String key, Map<String, String> map){
@@ -110,6 +157,10 @@ public class DataManager {
         return bRoomsLocations.get(key);
     }
 
+    public Boolean isBRoomsLocationsValid(String key){
+        return bRoomsLocations.containsKey(key);
+    }
+
     public void setBRoomsLocations(String key, Map<String, Map<String, Double>> map){
         bRoomsLocations.put(key, map);
     }
@@ -118,8 +169,60 @@ public class DataManager {
         return bRoomsBossesLocations.get(key);
     }
 
-    public void setbRoomsBossesLocations(String key, Map<String, Double> map){
-        bRoomsBossesLocations.put(key, map);
+    public Boolean isBRoomsBossesLocationsValid(String key){
+        return bRoomsBossesLocations.containsKey(key);
+    }
+
+    public Boolean getBRoomPlayersRole(UUID id){
+        return bRoomPlayersRole.get(id);
+    }
+
+    public void setbRoomPlayersRole(UUID id, Boolean role){
+        bRoomPlayersRole.put(id, role);
+    }
+
+    public void removePlayerRole(UUID id){
+        bRoomPlayersRole.remove(id);
+    }
+
+    public Set<UUID> getInGamePlayersList(){
+        return bRoomPlayersRoom.keySet();
+    }
+
+    public String getBRoomPlayersRoom(UUID id){
+        return bRoomPlayersRoom.get(id);
+    }
+
+    public void removePlayersRoom(UUID id){
+        bRoomPlayersRoom.remove(id);
+    }
+
+    public void setbRoomPlayersRoom(UUID id, String room){
+        bRoomPlayersRoom.put(id, room);
+    }
+
+    public Integer getBRoomWinCount(String bRoom){
+        return bRoomWinCount.get(bRoom);
+    }
+
+    public void addBRoomWinCount(String bRoom, int value){
+        if(bRoomWinCount.get(bRoom)!=null){
+            bRoomWinCount.put(bRoom, bRoomWinCount.get(bRoom)+value);
+        }else{
+            bRoomWinCount.put(bRoom, value);
+        }
+    }
+
+    public void resetBRoomWinCount(String bRoom){
+        bRoomWinCount.put(bRoom, 0);
+    }
+
+    public ItemStack getCrateKey(){
+        return crateKey;
+    }
+
+    public void depositPlayer(Player p, Double amount){
+        economy.depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), amount);
     }
 
 }

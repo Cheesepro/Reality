@@ -3,6 +3,9 @@ package me.cheesepro.reality;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.abilities.*;
+import me.cheesepro.reality.bossrooms.*;
+import me.cheesepro.reality.bossrooms.bosses.*;
+import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.commands.CommandsManager;
 import me.cheesepro.reality.level.LevelLimiter;
 import me.cheesepro.reality.listeners.*;
@@ -12,6 +15,7 @@ import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.ConfigManager;
 import me.cheesepro.reality.utils.Logger;
 import me.cheesepro.reality.level.XPGainListener;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -84,7 +89,7 @@ public class Reality extends JavaPlugin implements Listener{
     private Map<UUID, Map<String, String>> playersINFO = new HashMap<UUID, Map<String, String>>();
 
     /*
-     * This array contains all the Abilities types.
+     * This array contains all the Abilities.
      */
     private Abilities abilities[] = new Abilities[9];
 
@@ -116,7 +121,7 @@ public class Reality extends JavaPlugin implements Listener{
     private Map<String, String> bRoomsBosses = new HashMap<String,String>();
 
     /*
-     * This map stores where the bosses located
+     * This map stores where the bossrooms located
      * Format: Map<RoomName, Map<x/y/z, value>>
      */
     private Map<String, Map<String, Double>> bRoomsBossesLocations = new HashMap<String, Map<String, Double>>();
@@ -134,19 +139,41 @@ public class Reality extends JavaPlugin implements Listener{
     private Map<String, Map<String, String>> bRoomsSettings = new HashMap<String, Map<String, String>>();
 
     /*
-     * Stores the world where all the bosses will be allowed.
+     * Stores the world where all the bossrooms will be allowed.
      */
     private String bossesWorld = null;
 
     /*
      * Stores all the bossTypes
      */
-    private List<String> bossesTypes = new ArrayList<String>();
+    private Set<String> bossesTypes = new HashSet<String>();
 
     /*
      * Stores either the boss room is enabled or not.
      */
     private Map<String, Boolean> bRoomsEnabled = new HashMap<String, Boolean>();
+
+    /*
+     * Stores all the players who are currently playing with their role.
+     * true == the host
+     * false == who are invited
+     */
+    private Map<UUID, Boolean> bRoomPlayersRole = new HashMap<UUID, Boolean>();
+
+    /*
+     * Stores which player is in what room
+     */
+    private Map<UUID, String> bRoomPlayersRoom = new HashMap<UUID, String>();
+
+    /*
+     * Stores how many times the bosses were killed per game round;
+     */
+    private Map<String, Integer> bRoomWinCount = new HashMap<String, Integer>();
+
+    /*
+     * Contains bosses array
+     */
+    private Bosses[] bosses = new Bosses[9];
 
     private Logger logger = new Logger();
 
@@ -159,18 +186,26 @@ public class Reality extends JavaPlugin implements Listener{
     private Config cratesConfig;
     private Config bossRoomsConfig;
     private World world;
+    private static Economy economy = null;
     public static String pName = "[Reality]";
-    private final JavaPlugin plugin = this;
+    private static Reality plugin;
+
+    private BRoomManager bRoomManager;
 
     @Override
     public void onEnable(){
+        plugin = this;
         try{
+            bRoomManager = new BRoomManager(this);
             loadConfig();
             saveDefaultConfig();
             cache();
-            registerCommands();
             registerListeners();
             registerAbilities();
+            registerBosses();
+            setupEconomy();
+            registerCommands();
+            BossesSetup bossesSetup = new BossesSetup();
             if(getWorldEdit()==null){
                 logger.warn("WorldEdit dependency not found!");
             }
@@ -186,12 +221,21 @@ public class Reality extends JavaPlugin implements Listener{
     @Override
     public void onDisable(){
         try{
-            HandlerList.unregisterAll(plugin);
+            HandlerList.unregisterAll((Plugin) plugin);
             Bukkit.getScheduler().cancelTasks(plugin);
             logger.info("Successfully Disabled");
         }catch (Exception e){
             logger.error(e);
         }
+    }
+
+    public boolean setupEconomy()
+    {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+        return (economy != null);
     }
 
     private void registerCommands(){
@@ -209,6 +253,10 @@ public class Reality extends JavaPlugin implements Listener{
         new KeysGiver(this);
         new LuckyCrates(this);
         new CratesBreakingPreventer(this);
+        new BRoomBossesDieListener();
+        new BRoomCommandsListener(this);
+        new BRoomPlayerDieListener();
+        new PlayerQuitListener();
     }
 
     private void registerAbilities(){
@@ -223,6 +271,18 @@ public class Reality extends JavaPlugin implements Listener{
         abilities[8] = new AbilityFeed(this);
     }
 
+    private void registerBosses(){
+        bosses[0] = new BossBlaze(this);
+        bosses[1] = new BossChicken(this);
+        bosses[2] = new BossCow(this);
+        bosses[3] = new BossCreeper(this);
+        bosses[4] = new BossEnderman(this);
+        bosses[5] = new BossPig(this);
+        bosses[6] = new BossSkeleton(this);
+        bosses[7] = new BossSpider(this);
+        bosses[8] = new BossZombie(this);
+    }
+
     private void loadConfig() throws IOException{
         configManager = new ConfigManager(this);
         ranksConfig = configManager.getNewConfig("ranks.yml", new String[]{"\"Reality\" Ranks Configurations"});
@@ -234,7 +294,8 @@ public class Reality extends JavaPlugin implements Listener{
         levelsConfig = configManager.getNewConfig("levels.yml");
         configManager.copyDefaultConfig("luckycrates.yml");
         cratesConfig = configManager.getNewConfig("luckycrates.yml");
-        bossRoomsConfig = configManager.getNewConfig("BossRooms.yml");
+        configManager.copyDefaultConfig("bossrooms.yml");
+        bossRoomsConfig = configManager.getNewConfig("bossrooms.yml");
     }
 
     private void cache(){
@@ -416,11 +477,10 @@ public class Reality extends JavaPlugin implements Listener{
         crateKey.setItemMeta(im);
 
         if(bossRoomsConfig.get("world")!=null) {
-            int errorCheck = 0;
             bossesWorld = String.valueOf(bossRoomsConfig.get("world"));
-            errorCheck++;
             if(bossRoomsConfig.get("rooms")!=null){
                 for(String roomName : bossRoomsConfig.getConfigurationSection("rooms").getKeys(false)){
+                    int errorCheck = 0;
                     if(bossRoomsConfig.get("rooms." + roomName + ".locations")!=null){
                         Map<String, Map<String, Double>> locs = new HashMap<String, Map<String, Double>>();
                         if(bossRoomsConfig.get("rooms." + roomName + ".locations.lobby")!=null){
@@ -428,6 +488,8 @@ public class Reality extends JavaPlugin implements Listener{
                             location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.x"));
                             location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.y"));
                             location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.z"));
+                            location.put("pitch", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.pitch"));
+                            location.put("yaw", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.lobby.yaw"));
                             locs.put("lobby", location);
                             bRoomsLocations.put(roomName, locs);
                             errorCheck++;
@@ -437,6 +499,8 @@ public class Reality extends JavaPlugin implements Listener{
                             location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.x"));
                             location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.y"));
                             location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.z"));
+                            location.put("pitch", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.pitch"));
+                            location.put("yaw", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spectate.yaw"));
                             locs.put("spectate", location);
                             bRoomsLocations.put(roomName, locs);
                             errorCheck++;
@@ -446,6 +510,8 @@ public class Reality extends JavaPlugin implements Listener{
                             location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.x"));
                             location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.y"));
                             location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.z"));
+                            location.put("pitch", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.pitch"));
+                            location.put("yaw", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.end.yaw"));
                             locs.put("end", location);
                             bRoomsLocations.put(roomName, locs);
                             errorCheck++;
@@ -455,12 +521,13 @@ public class Reality extends JavaPlugin implements Listener{
                             location.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.x"));
                             location.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.y"));
                             location.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.z"));
-                            locs.put("end", location);
+                            location.put("pitch", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.pitch"));
+                            location.put("yaw", bossRoomsConfig.getDouble("rooms." + roomName + ".locations.spawn.yaw"));
+                            locs.put("spawn", location);
                             bRoomsLocations.put(roomName, locs);
                             errorCheck++;
                         }
                     }
-
                     if(bossRoomsConfig.get("rooms." + roomName + ".boss")!=null){
                         if(bossRoomsConfig.get("rooms." + roomName + ".boss.type")!=null){
                             bRoomsBosses.put(roomName, String.valueOf(bossRoomsConfig.get("rooms." + roomName + ".boss.type")));
@@ -470,6 +537,8 @@ public class Reality extends JavaPlugin implements Listener{
                                 loc.put("x", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.x"));
                                 loc.put("y", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.y"));
                                 loc.put("z", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.z"));
+                                loc.put("pitch", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.pitch"));
+                                loc.put("yaw", bossRoomsConfig.getDouble("rooms." + roomName + ".boss.spawnlocation.yaw"));
                                 bRoomsBossesLocations.put(roomName, loc);
                                 errorCheck++;
                             }
@@ -492,6 +561,12 @@ public class Reality extends JavaPlugin implements Listener{
                         }
                         bRoomsSettings.put(roomName, settings);
                     }
+                    if(errorCheck==9){
+                        bossRoomsConfig.set("rooms." + roomName + ".enabled", true);
+                        bossRoomsConfig.saveConfig();
+                        bRoomsEnabled.put(roomName, true);
+                        bRoomManager.setupBRooms();
+                    }
                 }
                 if(bRoomsBosses!=null){
                     for(String room : bRoomsBosses.keySet()){
@@ -499,18 +574,6 @@ public class Reality extends JavaPlugin implements Listener{
                     }
                 }
             }
-            if(errorCheck!=10){
-                logger.warn("Something went wrong when caching boss rooms configurations! Please check your config see if anything is missing or in the wrong format!");
-            }
-//            if (bossesConfig.get("locations") != null) {
-//                for (String bossName : bossesConfig.getConfigurationSection("locations").getKeys(false)) {
-//                    Map<String, Double> location = new HashMap<String, Double>();
-//                    location.put("x", bossesConfig.getDouble("locations." + bossName + ".x"));
-//                    location.put("y", bossesConfig.getDouble("locations." + bossName + ".y"));
-//                    location.put("z", bossesConfig.getDouble("locations." + bossName + ".z"));
-//                    bossesLocations.put(bossName.toLowerCase(), location);
-//                }
-//            }
         }
     }
 
@@ -536,7 +599,13 @@ public class Reality extends JavaPlugin implements Listener{
         return (WorldGuardPlugin) plugin;
     }
 
+    public static Economy getEconomy(){
+        return economy;
+    }
 
+    public static Reality getPlugin(){
+        return plugin;
+    }
 
     public Map<String, Map<String, List<String>>> getRanks() {
         return ranks;
@@ -630,11 +699,27 @@ public class Reality extends JavaPlugin implements Listener{
         return bossesWorld;
     }
 
-    public List<String> getBossesTypes(){
+    public Set<String> getBossesTypes(){
         return bossesTypes;
     }
 
     public Map<String, Boolean> getbRoomsEnabled(){
         return bRoomsEnabled;
+    }
+
+    public Map<UUID, Boolean> getbRoomPlayersRole() {
+        return bRoomPlayersRole;
+    }
+
+    public Map<UUID, String> getbRoomPlayersRoom() {
+        return bRoomPlayersRoom;
+    }
+
+    public Map<String, Integer> getbRoomWinCount(){
+        return bRoomWinCount;
+    }
+
+    public Bosses[] getBosses(){
+        return bosses;
     }
 }

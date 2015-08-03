@@ -1,12 +1,13 @@
-package me.cheesepro.reality.bosses.types;
+package me.cheesepro.reality.bossrooms.bosses;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bosses.Bosses;
-import me.cheesepro.reality.bosses.BossesSetup;
+import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Pig;
+import org.bukkit.entity.Zombie;
 
 
 /**
@@ -15,18 +16,23 @@ import org.bukkit.entity.Pig;
 public class BossPig implements Bosses {
 
     Reality plugin;
-    BossesSetup bossesSetup;
+    BossesAPI bossesAPI;
     String name = ChatColor.RED.toString() + "Pig";
     String skill = "Spawns a zombie once every 15 seconds to help him fight";
     Integer health = 50;
     Integer damage = 4;
     Integer rewardXP = 2500;
     Integer rewardKey = 1;
-    Integer rewardMoney = 2500;
+    Double rewardMoney = 2500.0;
 
     public BossPig(Reality plugin){
         this.plugin = plugin;
-        bossesSetup = new BossesSetup(plugin);
+        bossesAPI = new BossesAPI(plugin);
+    }
+
+    @Override
+    public String getType(){
+        return "pig";
     }
 
     @Override
@@ -60,16 +66,22 @@ public class BossPig implements Bosses {
     }
 
     @Override
-    public Integer getRewardMoney() {
+    public Double getRewardMoney() {
         return rewardMoney;
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
         Pig pig = loc.getWorld().spawn(loc, Pig.class);
         pig.setBreed(false);
         pig.setAgeLock(true);
-        bossesSetup.basicSetup(pig, name, health);
+        bossesAPI.basicSetup(pig, name, health);
     }
+
+    public void spawn(Location loc){
+        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
+        bossesAPI.basicSetup(zombie, name, health);
+    }
+
 }

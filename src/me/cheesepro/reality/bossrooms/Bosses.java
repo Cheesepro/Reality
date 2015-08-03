@@ -1,10 +1,14 @@
-package me.cheesepro.reality.bosses;
+package me.cheesepro.reality.bossrooms;
 
+
+import org.bukkit.Location;
 
 /**
  * Created by Mark on 2015-07-19.
  */
 public interface Bosses {
+
+    public String getType();
 
     public String getName();
 
@@ -18,8 +22,10 @@ public interface Bosses {
 
     public Integer getRewardKey();
 
-    public Integer getRewardMoney();
+    public Double getRewardMoney();
 
-    public void spawn(String w, double x, double y, double z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw);
+
+    public void spawn(Location loc);
 
 }

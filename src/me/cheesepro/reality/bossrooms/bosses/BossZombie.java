@@ -1,8 +1,8 @@
-package me.cheesepro.reality.bosses.types;
+package me.cheesepro.reality.bossrooms.bosses;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bosses.Bosses;
-import me.cheesepro.reality.bosses.BossesSetup;
+import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,18 +15,22 @@ import org.bukkit.entity.Zombie;
 public class BossZombie implements Bosses {
 
     Reality plugin;
-    BossesSetup bossesSetup;
+    BossesAPI bossesAPI;
     String name = ChatColor.DARK_GREEN.toString() + "Zombie";
     String skill = "Spawns multiple normal zombies and mobs the player";
     Integer health = 50;
     Integer damage = 4;
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
-    Integer rewardMoney = 9000;
-
+    Double rewardMoney = 9000.0;
     public BossZombie(Reality plugin){
         this.plugin = plugin;
-        bossesSetup = new BossesSetup(plugin);
+        bossesAPI = new BossesAPI(plugin);
+    }
+
+    @Override
+    public String getType(){
+        return "zombie";
     }
 
     @Override
@@ -60,14 +64,19 @@ public class BossZombie implements Bosses {
     }
 
     @Override
-    public Integer getRewardMoney() {
+    public Double getRewardMoney() {
         return rewardMoney;
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z);
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
         Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
-        bossesSetup.basicSetup(zombie, name, health);
+        bossesAPI.basicSetup(zombie, name, health);
     }
+    public void spawn(Location loc){
+        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
+        bossesAPI.basicSetup(zombie, name, health);
+    }
+
 }
