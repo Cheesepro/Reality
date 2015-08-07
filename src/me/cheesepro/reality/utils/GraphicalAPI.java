@@ -44,10 +44,19 @@ public class GraphicalAPI {
         sendRaw(json, player);
     }
 
+    public static void sendHotBarText(String text, Player player){
+        sendRaw(text, player);
+    }
+
     public static void sendRaw(String json, Player[] player){
         PacketPlayOutChat chat = new PacketPlayOutChat(new ChatComponentText(json), (byte)2);
         for(Player p : player)sendPacket(chat, p);
     }
+    public static void sendRaw(String text, Player player){
+        PacketPlayOutChat chat = new PacketPlayOutChat(new ChatComponentText(text), (byte)2);
+        sendPacket(chat, player);
+    }
+
 
     private static void sendPacket(Packet p, Player p1){
         ((CraftPlayer)p1).getHandle().playerConnection.sendPacket(p);

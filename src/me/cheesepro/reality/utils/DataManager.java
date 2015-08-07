@@ -214,7 +214,7 @@ public class DataManager {
     }
 
     public void resetBRoomWinCount(String bRoom){
-        bRoomWinCount.put(bRoom, 0);
+        bRoomWinCount.remove(bRoom);
     }
 
     public ItemStack getCrateKey(){
@@ -222,7 +222,15 @@ public class DataManager {
     }
 
     public void depositPlayer(Player p, Double amount){
-        economy.depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), amount);
+        Reality.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), amount);
+    }
+
+    public void chargePlayer(Player p, Double amount){
+        economy.withdrawPlayer(Bukkit.getOfflinePlayer(p.getUniqueId()), amount);
+    }
+
+    public Boolean playerHasEnoughMoney(Player p, Double amount){
+        return economy.getBalance(Bukkit.getOfflinePlayer(p.getUniqueId()))>=amount;
     }
 
 }

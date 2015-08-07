@@ -8,7 +8,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import javax.xml.crypto.Data;
 import java.util.Map;
 import java.util.UUID;
 
@@ -113,6 +112,7 @@ public class PlayerManager {
     public String levelUp(UUID id){
         if(playersINFO.get(id)!=null){
             int nextH = Integer.parseInt(playersINFO.get(id).get("level"))+1;
+            //TODO add skip level upgrading when lots of XP are received
             String next = String.valueOf(nextH);
             if(Integer.parseInt(playersINFO.get(id).get("xp"))>=levels.get(next)){
                 setLevel(id, nextH);

@@ -75,8 +75,7 @@ public class BossZombie implements Bosses {
         bossesAPI.basicSetup(zombie, name, health);
     }
     public void spawn(Location loc){
-        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
-        bossesAPI.basicSetup(zombie, name, health);
+        spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
     }
 
 }

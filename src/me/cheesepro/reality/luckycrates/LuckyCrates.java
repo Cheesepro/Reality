@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.xml.crypto.Data;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +107,7 @@ public class LuckyCrates implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if (!e.getInventory().getName().equalsIgnoreCase(inv.getName())) return;
+        if (e.getCurrentItem() == null) return;
         if (e.getCurrentItem().getItemMeta() == null) return;
         if (e.getClick() == ClickType.UNKNOWN) return;
         if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE.toString() + ChatColor.BOLD + "SPIN")) {

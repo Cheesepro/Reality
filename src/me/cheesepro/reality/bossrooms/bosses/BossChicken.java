@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Zombie;
 
 
 /**
@@ -79,7 +78,6 @@ public class BossChicken implements Bosses{
     }
 
     public void spawn(Location loc){
-        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
-        bossesAPI.basicSetup(zombie, name, health);
+        spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
     }
 }

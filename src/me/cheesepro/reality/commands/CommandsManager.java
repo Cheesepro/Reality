@@ -18,16 +18,16 @@ import java.util.Map;
  */
 public class CommandsManager implements CommandExecutor{
 
-    Reality plugin;
-    Messenger msg;
-    Tools tools;
-    List<String> cratesItems;
-    Map<String, Map<String, Integer>> cratesLocations;
-    Config cratesConfig;
-    PlayerManager pManager;
+    private Reality plugin;
+    private Messenger msg;
+    private Tools tools;
+    private List<String> cratesItems;
+    private Map<String, Map<String, Integer>> cratesLocations;
+    private Config cratesConfig;
+    private PlayerManager pManager;
 
-    CratesCommands cratesCommands;
-    BossesCommands bossesCommands;
+    private CratesCommands cratesCommands;
+    private BossesCommands bossesCommands;
 
     public CommandsManager(Reality plugin){
         this.plugin = plugin;

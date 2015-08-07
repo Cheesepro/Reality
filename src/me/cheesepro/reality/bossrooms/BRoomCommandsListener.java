@@ -2,6 +2,7 @@ package me.cheesepro.reality.bossrooms;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.rooms.BRoom;
+import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
 import org.bukkit.Bukkit;
@@ -28,11 +29,14 @@ public class BRoomCommandsListener implements Listener{
     private Map<UUID, UUID> invitedPlayer = new HashMap<UUID, UUID>();
     private Map<UUID, Integer> timeoutCount = new HashMap<UUID, Integer>();
     private boolean isRepeatingTaskRunning = false;
+    private BRoomManager bRoomManager;
 
     public BRoomCommandsListener(Reality plugin){
         this.plugin = plugin;
         dataManager = new DataManager(plugin);
         msg = new Messenger(plugin);
+        bRoomManager = new BRoomManager(plugin);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -43,8 +47,8 @@ public class BRoomCommandsListener implements Listener{
             String[] args = e.getMessage().split(" ");
             String command = args[0];
             UUID id = p.getUniqueId();
-            BRoom bRoom = new BRoom(dataManager.getBRoomPlayersRoom(id));
-            if(command.equalsIgnoreCase("start")){
+            BRoom bRoom = bRoomManager.getBRoom(p);
+            if(command.equalsIgnoreCase("/start")){
                 if(dataManager.getBRoomPlayersRole(id)){
                     if(bRoom.getCurrentPlayers()>=bRoom.getMinPlayer()){
                         bRoom.start();
@@ -54,9 +58,9 @@ public class BRoomCommandsListener implements Listener{
                 }else{
                     msg.send(p, "e", "Sorry, only the host of the game can access the command /start");
                 }
-            }else if(command.equalsIgnoreCase("quit")){
+            }else if(command.equalsIgnoreCase("/quit")){
                 bRoom.removePlayer(p);
-            }else if(command.equalsIgnoreCase("invite")){
+            }else if(command.equalsIgnoreCase("/invite")){
                 if(dataManager.getBRoomPlayersRole(id)){
                     if(bRoom.getState()==BRoom.BRoomState.LOBBY) {
                         if (bRoom.getCurrentPlayers() <= bRoom.getMaxPlayer()) {
@@ -83,6 +87,8 @@ public class BRoomCommandsListener implements Listener{
                         msg.send(p, "d", "Invitation can only be sent when the room is in Lobby state!");
                     }
                 }
+            }else{
+                msg.send(p, "c", "You are not allowed to use any non boss room related commands!");
             }
             e.setCancelled(true);
         } else{

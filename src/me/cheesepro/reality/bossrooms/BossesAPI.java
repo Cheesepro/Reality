@@ -1,19 +1,18 @@
 package me.cheesepro.reality.bossrooms;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bossrooms.bosses.*;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.*;
-
-import java.util.*;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 
 /**
  * Created by Mark on 2015-07-19.
  */
 public class BossesAPI {
 
-    Reality plugin;
-    Bosses[] bosses;
+    private Reality plugin;
+    private Bosses[] bosses;
 
     public BossesAPI(Reality plugin){
         this.plugin = plugin;
@@ -21,6 +20,7 @@ public class BossesAPI {
     }
 
     public void basicSetup(Creature animals, String name, int health) {
+        animals.setMaxHealth(health * 2.0);
         animals.setHealth(health * 2.0);
         animals.setCustomName(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + name);
         animals.setCustomNameVisible(true);
@@ -33,6 +33,10 @@ public class BossesAPI {
             }
         }
         return null;
+    }
+
+    private void setMaxHealth(Entity entity, int maxhealth){
+        ((Damageable) entity).setMaxHealth(maxhealth);
     }
 
 }

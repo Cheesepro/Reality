@@ -200,11 +200,11 @@ public class Reality extends JavaPlugin implements Listener{
             loadConfig();
             saveDefaultConfig();
             cache();
-            registerListeners();
             registerAbilities();
             registerBosses();
             setupEconomy();
             registerCommands();
+            registerListeners();
             BossesSetup bossesSetup = new BossesSetup();
             if(getWorldEdit()==null){
                 logger.warn("WorldEdit dependency not found!");
@@ -253,10 +253,12 @@ public class Reality extends JavaPlugin implements Listener{
         new KeysGiver(this);
         new LuckyCrates(this);
         new CratesBreakingPreventer(this);
-        new BRoomBossesDieListener();
+        new BRoomBossesDieListener(this);
         new BRoomCommandsListener(this);
         new BRoomPlayerDieListener();
         new PlayerQuitListener();
+        new BRoomUpdateListener();
+        new BRoomShopInvListener(this);
     }
 
     private void registerAbilities(){

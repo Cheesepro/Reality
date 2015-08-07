@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Cow;
-import org.bukkit.entity.Zombie;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,7 +20,7 @@ public class BossCow implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.GRAY.toString() + "Cow";
     String skill = "Potion of regeneration level 1 for the first 60 secs";
-    Integer health = 50;
+    Integer health = 1;
     Integer damage = 4;
     Integer rewardXP = 1500;
     Integer rewardKey = 1;
@@ -83,7 +82,6 @@ public class BossCow implements Bosses {
     }
 
     public void spawn(Location loc){
-        Zombie zombie = loc.getWorld().spawn(loc, Zombie.class);
-        bossesAPI.basicSetup(zombie, name, health);
+        spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
     }
 }
