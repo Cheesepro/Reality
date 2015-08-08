@@ -61,8 +61,10 @@ public class BRoomBossesDieListener implements Listener {
 
     private Boolean isEntityBoss(EntityDeathEvent e, String name){
         if(entities.contains(e.getEntityType())){
-            if(e.getEntity().getCustomName().equalsIgnoreCase(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + name)){
-                return true;
+            if(e.getEntity().getCustomName()!=null){
+                if(e.getEntity().getCustomName().equalsIgnoreCase(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + name)){
+                    return true;
+                }
             }
         }
         return false;

@@ -1,5 +1,10 @@
 package me.cheesepro.reality.bossrooms.rooms;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
@@ -9,6 +14,7 @@ import me.cheesepro.reality.utils.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +36,8 @@ public class BRoom {
     private Messenger msg = new Messenger(plugin);
     private BossesAPI bossesAPI= new BossesAPI(plugin);
     private PlayerManager pManager = new PlayerManager(plugin);
+    private WorldGuardPlugin worldGuard = plugin.getWorldGuard();
+    private WorldEditPlugin worldEditPlugin = plugin.getWorldEdit();
 
     public BRoom(String name) {
         BRoomName = name;
@@ -135,6 +143,7 @@ public class BRoom {
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
 
         new Countdown(
+                false,
                 15,
                 "Boss Room " + getBRoomName() + " is starting in %t seconds!",
                 this,
@@ -160,6 +169,7 @@ public class BRoom {
 
     public void bossDie(){
         new Countdown(
+                false,
                 10,
                 "Boss will respawn in %t seconds!",
                 this,
@@ -173,6 +183,22 @@ public class BRoom {
     }
 
     public void stop(){
+        new Countdown(true, 0, null, null);
+        ProtectedRegion rg = worldGuard.getRegionManager(Bukkit.getWorld(dataManager.getBossesWorld())).getRegion("reality_bossroom_" + getBRoomName());
+        if(rg!=null){
+            Region region = new CuboidRegion(rg.getMaximumPoint(), rg.getMinimumPoint());
+            Location centerLoc = new Location(Bukkit.getWorld(dataManager.getBossesWorld()), region.getCenter().getX(), region.getCenter().getY(),region.getCenter().getZ());
+            Collection<Entity> entities = Bukkit.getWorld(dataManager.getBossesWorld()).getNearbyEntities(centerLoc, region.getWidth() / 2, region.getHeight() / 2, region.getLength() / 2);
+            for(Entity entity : entities){
+                if(entity!=null){
+                    if(entity.getCustomName()!=null){
+                        if(entity.getCustomName().equalsIgnoreCase(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + bossesAPI.getBoss(getBossType()).getName())){
+                            entity.remove();
+                        }
+                    }
+                }
+            }
+        }
         if(dataManager.getBRoomWinCount(getBRoomName())!=null && dataManager.getBRoomWinCount(getBRoomName())!=0){
             Set<String> pNames = new HashSet<String>();
             for(UUID id : players){
@@ -282,12 +308,16 @@ public class BRoom {
         private BRoom bRoom;
         private ArrayList<Integer> countingNums;
 
-        public Countdown(int start, String message, BRoom bRoom, int... countingNums) {
-            this.timer = start;
-            this.message = message;
-            this.bRoom = bRoom;
-            this.countingNums = new ArrayList<Integer>();
-            for (int i : countingNums) this.countingNums.add(i);
+        public Countdown(boolean stop, int start, String message, BRoom bRoom, int... countingNums) {
+            if(stop){
+                stop();
+            }else{
+                this.timer = start;
+                this.message = message;
+                this.bRoom = bRoom;
+                this.countingNums = new ArrayList<Integer>();
+                for (int i : countingNums) this.countingNums.add(i);
+            }
         }
 
         public void run() {
@@ -308,6 +338,10 @@ public class BRoom {
                 }
             }
             timer--;
+        }
+        //TODO fix timer still running when player executed /quit when respawn counting down.
+        public void stop(){
+            cancel();
         }
     }
 
