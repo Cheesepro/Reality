@@ -135,9 +135,16 @@ public class BRoom {
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
 
         new Countdown(
-                1,
+                15,
                 "Boss Room " + getBRoomName() + " is starting in %t seconds!",
                 this,
+                15,
+                10,
+                9,
+                5,
+                4,
+                3,
+                2,
                 1
         ).runTaskTimer(Reality.getPlugin(), 0, 20);
         //20 ticks == 1 second
@@ -152,7 +159,17 @@ public class BRoom {
     }
 
     public void bossDie(){
-        //TODO add boss respawn
+        new Countdown(
+                10,
+                "Boss will respawn in %t seconds!",
+                this,
+                10,
+                5,
+                4,
+                3,
+                2,
+                1
+        ).runTaskTimer(Reality.getPlugin(), 0, 20);
     }
 
     public void stop(){
