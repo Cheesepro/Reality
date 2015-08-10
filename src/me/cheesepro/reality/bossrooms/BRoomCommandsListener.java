@@ -61,6 +61,10 @@ public class BRoomCommandsListener implements Listener{
             }else if(command.equalsIgnoreCase("/quit")){
                 bRoom.removePlayer(p);
             }else if(command.equalsIgnoreCase("/invite")){
+                if(args.length!=2){
+                    msg.send(p, "e", "Player provide a valid player's name /invite <player>");
+                    return;
+                }
                 if(dataManager.getBRoomPlayersRole(id)){
                     if(bRoom.getState()==BRoom.BRoomState.LOBBY) {
                         if (bRoom.getCurrentPlayers() <= bRoom.getMaxPlayer()) {
@@ -86,23 +90,27 @@ public class BRoomCommandsListener implements Listener{
                     }else{
                         msg.send(p, "d", "Invitation can only be sent when the room is in Lobby state!");
                     }
+                }else{
+                    msg.send(p, "e", "Sorry, only the host of the game can access the command /invite");
                 }
             }else{
                 msg.send(p, "c", "You are not allowed to use any non boss room related commands!");
             }
-            e.setCancelled(true);
         } else{
-            if(invitedPlayer.keySet().contains(p.getUniqueId())){
+            if(invitedPlayer.keySet().contains(p.getUniqueId())) {
                 String command = e.getMessage();
-                if(command.equalsIgnoreCase("accept")){
-                    BRoom bRoom = new BRoom(dataManager.getBRoomPlayersRoom(invitedPlayer.get(p.getUniqueId())));
+                if(command.equalsIgnoreCase("/accept")){
+                    e.setCancelled(true);
+                    BRoom bRoom = bRoomManager.getBRoom(dataManager.getBRoomPlayersRoom(invitedPlayer.get(p.getUniqueId())));
                     if(bRoom.getState() == BRoom.BRoomState.LOBBY){
                         bRoom.addPlayer(p);
+                        msg.send(p, "d", "You can only access to the command /quit right now.");
                     }else{
                         msg.send(p, "c", "Sorry but the boss room that you were invited to is currently not accepting new players to join.");
                     }
                     invitedPlayer.remove(p.getUniqueId());
-                }else if(command.equalsIgnoreCase("deny")){
+                }else if(command.equalsIgnoreCase("/deny")){
+                    e.setCancelled(true);
                     msg.send(p, "e", "Successfully denied the invitation");
                     msg.send(Bukkit.getPlayer(invitedPlayer.get(p.getUniqueId())), "c", p.getName() + " have denied your invitation.");
                     invitedPlayer.remove(p.getUniqueId());

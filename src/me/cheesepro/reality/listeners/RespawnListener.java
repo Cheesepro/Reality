@@ -31,6 +31,7 @@ public class RespawnListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void respawnListener(PlayerRespawnEvent e){
         final Player p = e.getPlayer();
+        p.setCanPickupItems(true); //FOR BOSSROOM AUTO RESPAWN
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -41,9 +42,9 @@ public class RespawnListener implements Listener{
                         Float.parseFloat(settings.get("respawnlocation").get(4)),
                         Float.parseFloat(settings.get("respawnlocation").get(5)));
                 p.teleport(loc);
+                rankGiver.giveRank(p); //FOR BOSSROOM AUTO RESPAWN
             }
         }, 10);
-        rankGiver.giveRank(p);
     }
 
 }

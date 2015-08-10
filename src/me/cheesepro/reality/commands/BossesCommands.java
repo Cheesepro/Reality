@@ -201,7 +201,7 @@ public class BossesCommands {
                 region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
                 region.setFlag(DefaultFlag.ENDERPEARL, StateFlag.State.DENY);
                 region.setFlag(DefaultFlag.GAME_MODE, GameMode.SURVIVAL);
-                region.setFlag(DefaultFlag.PVP, StateFlag.State.ALLOW);
+                region.setFlag(DefaultFlag.PVP, StateFlag.State.DENY);
                 region.setFlag(DefaultFlag.TNT, StateFlag.State.DENY);
                 region.setFlag(DefaultFlag.ENTITY_PAINTING_DESTROY, StateFlag.State.DENY);
                 region.setFlag(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, StateFlag.State.DENY);
@@ -332,6 +332,10 @@ public class BossesCommands {
                 if(room.getState() == BRoom.BRoomState.READY){
                     Double cost = bossesAPI.getBoss(room.getBossType()).getRewardMoney() * 3;
                     if(dataManager.playerHasEnoughMoney(p, cost)){
+                        if(p.getInventory().firstEmpty()==-1){
+                            msg.send(p, "c", "Please leave at least ONE empty inventory slot for the reward you'll get, to prevent other players from picking your reward up on the ground!");
+                            return;
+                        }
                         dataManager.chargePlayer(p, cost);
                         room.addPlayer(p);
                         msg.send(p, "a", "We have charged you $" + cost + " for the boss room that you have selected");
@@ -344,7 +348,10 @@ public class BossesCommands {
                         msg.send(p, "c"  ,"Sorry but you do not have enough money to purchase that boss room!");
                     }
                 }else{
-                    msg.send(p, "e", "Boss room " +bRoom+ " is " + room.getState());
+                    msg.send(p, "e", "Boss room " +bRoom+ " is currently not available to join, because its status is: " + ChatColor.RED + room.getState());
+                    if(room.getState()== BRoom.BRoomState.LOBBY){
+                        msg.send(p, "a", "It is still possible to join currently if the host of the game /invite you");
+                    }
                 }
             }else{
                 msg.send(p, "e", bRoom + " is not a valid boss room!");

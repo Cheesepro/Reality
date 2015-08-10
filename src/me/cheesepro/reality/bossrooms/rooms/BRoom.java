@@ -1,6 +1,5 @@
 package me.cheesepro.reality.bossrooms.rooms;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -37,7 +36,7 @@ public class BRoom {
     private BossesAPI bossesAPI= new BossesAPI(plugin);
     private PlayerManager pManager = new PlayerManager(plugin);
     private WorldGuardPlugin worldGuard = plugin.getWorldGuard();
-    private WorldEditPlugin worldEditPlugin = plugin.getWorldEdit();
+    private Boolean stop = false;
 
     public BRoom(String name) {
         BRoomName = name;
@@ -122,14 +121,19 @@ public class BRoom {
             stop();
         }else{
             p.teleport(end);
-            double rewardMoney = (int) Math.round(bossesAPI.getBoss(getBossType()).getRewardMoney()/currentPlayers*dataManager.getBRoomWinCount(getBRoomName()));
-            int rewardXP = Math.round(bossesAPI.getBoss(getBossType()).getRewardXP()/currentPlayers * dataManager.getBRoomWinCount(getBRoomName()));
-            dataManager.depositPlayer(p, rewardMoney);
-            pManager.addXP(p.getUniqueId(), rewardXP);
+            if(dataManager.getBRoomWinCount(getBRoomName())!=null && dataManager.getBRoomWinCount(getBRoomName())!=0){
+                double rewardMoney = (int) Math.round(bossesAPI.getBoss(getBossType()).getRewardMoney()/currentPlayers*dataManager.getBRoomWinCount(getBRoomName()));
+                int rewardXP = Math.round(bossesAPI.getBoss(getBossType()).getRewardXP()/currentPlayers * dataManager.getBRoomWinCount(getBRoomName()));
+                dataManager.depositPlayer(p, rewardMoney);
+                pManager.addXP(p.getUniqueId(), rewardXP);
+                msg.send(p, "d", "You have left the room, and you are rewarded with $" + rewardMoney + " dollars and " + rewardXP + "XP!");
+            }else{
+                msg.send(p, "d", "You have left the room, and you are rewarded with $0 dollars and no XP!");
+            }
             players.remove(p.getUniqueId());
             currentPlayers--;
             dataManager.removePlayerRole(p.getUniqueId());
-            msg.send(p, "d", "You have left the room, and you are rewarded with $"+rewardMoney + " dollars and " + rewardXP + "XP!");
+            dataManager.removePlayersRoom(p.getUniqueId());
         }
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
 
@@ -138,6 +142,7 @@ public class BRoom {
     }
 
     public void start(){
+        stop=false;
         this.state = BRoomState.COUNTING_DOWN;
         //TODO add Sign support
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
@@ -149,7 +154,6 @@ public class BRoom {
                 this,
                 15,
                 10,
-                9,
                 5,
                 4,
                 3,
@@ -163,7 +167,7 @@ public class BRoom {
         if(dataManager.getBRoomPlayersRole(p.getUniqueId())) {
             stop();
         }else{
-            p.teleport(spectate);
+            msg.send(p, "e", "You are currently spectating");
         }
     }
 
@@ -183,7 +187,7 @@ public class BRoom {
     }
 
     public void stop(){
-        new Countdown(true, 0, null, null);
+        stop = true;
         ProtectedRegion rg = worldGuard.getRegionManager(Bukkit.getWorld(dataManager.getBossesWorld())).getRegion("reality_bossroom_" + getBRoomName());
         if(rg!=null){
             Region region = new CuboidRegion(rg.getMaximumPoint(), rg.getMinimumPoint());
@@ -208,37 +212,40 @@ public class BRoom {
             double rewardMoney = (int) Math.round(bossesAPI.getBoss(getBossType()).getRewardMoney()/currentPlayers*dataManager.getBRoomWinCount(getBRoomName()));
             int rewardXP = Math.round(bossesAPI.getBoss(getBossType()).getRewardXP()/currentPlayers*dataManager.getBRoomWinCount(getBRoomName()));
             for(UUID id : players){
-                Player p = Bukkit.getPlayer(id);
-                p.teleport(end);
-                if(dataManager.getBRoomPlayersRole(id)){
-                    msg.send(p, "d", "You just received " + bossesAPI.getBoss(getBossType()).getRewardKey()*dataManager.getBRoomWinCount(getBRoomName()) + " lucky crate keys!");
-                    ItemStack crateKeys = dataManager.getCrateKey();
-                    crateKeys.setAmount(bossesAPI.getBoss(getBossType()).getRewardKey()*dataManager.getBRoomWinCount(getBRoomName()));
-                    HashMap<Integer, ItemStack> nope = p.getInventory().addItem(crateKeys);
-                    for(Map.Entry<Integer, ItemStack> entry : nope.entrySet())
-                    {
-                        msg.send(p, "d", "Your inventory is full, placing your reward(s) on the ground!");
-                        p.getWorld().dropItemNaturally(p.getLocation(), entry.getValue());
+                if(Bukkit.getPlayer(id)!=null){
+                    Player p = Bukkit.getPlayer(id);
+                    p.teleport(end);
+                    if(dataManager.getBRoomPlayersRole(id)){
+                        msg.send(p, "d", "You just received " + bossesAPI.getBoss(getBossType()).getRewardKey()*dataManager.getBRoomWinCount(getBRoomName()) + " lucky crate keys!");
+                        ItemStack crateKeys = dataManager.getCrateKey();
+                        crateKeys.setAmount(bossesAPI.getBoss(getBossType()).getRewardKey()*dataManager.getBRoomWinCount(getBRoomName()));
+                        HashMap<Integer, ItemStack> nope = p.getInventory().addItem(crateKeys);
+                        for(Map.Entry<Integer, ItemStack> entry : nope.entrySet())
+                        {
+                            msg.send(p, "d", "Your inventory is full, placing your reward(s) on the ground!");
+                            p.getWorld().dropItemNaturally(p.getLocation(), entry.getValue());
+                        }
                     }
+                    dataManager.removePlayerRole(p.getUniqueId());
+                    dataManager.removePlayersRoom(p.getUniqueId());
+                    dataManager.depositPlayer(p, rewardMoney);
+                    pManager.addXP(id, rewardXP);
+                    msg.send(p, "d", "The room is closed, and you are rewarded with $"+rewardMoney + " dollars and " + rewardXP + "XP!");
                 }
-                dataManager.removePlayerRole(p.getUniqueId());
-                dataManager.resetBRoomWinCount(getBRoomName());
-                dataManager.removePlayersRoom(p.getUniqueId());
-                dataManager.depositPlayer(p, rewardMoney);
-                pManager.addXP(id, rewardXP);
-                msg.send(p, "d", "The room is closed, and you are rewarded with $"+rewardMoney + " dollars and " + rewardXP + "XP!");
             }
         }else{
             for(UUID id : players){
-                msg.send(Bukkit.getPlayer(id), "d", "The boss was killed 0 times!");
-                Player p = Bukkit.getPlayer(id);
-                p.teleport(end);
-                dataManager.removePlayerRole(p.getUniqueId());
-                dataManager.resetBRoomWinCount(getBRoomName());
-                dataManager.removePlayersRoom(p.getUniqueId());
-                msg.send(p, "d", "The room is closed, and you are rewarded with $0 dollars and no XP!");
+                if(Bukkit.getPlayer(id)!=null){
+                    msg.send(Bukkit.getPlayer(id), "d", "The boss was killed 0 times!");
+                    Player p = Bukkit.getPlayer(id);
+                    p.teleport(end);
+                    dataManager.removePlayerRole(p.getUniqueId());
+                    dataManager.removePlayersRoom(p.getUniqueId());
+                    msg.send(p, "d", "The room is closed, and you are rewarded with $0 dollars and no XP!");
+                }
             }
         }
+        dataManager.resetBRoomWinCount(getBRoomName());
         players.clear();
         currentPlayers = 0;
         state = BRoomState.READY;
@@ -301,6 +308,10 @@ public class BRoom {
         return this.players;
     }
 
+    public Boolean getStop(){
+        return stop;
+    }
+
     private class Countdown extends BukkitRunnable {
 
         private int timer;
@@ -321,27 +332,27 @@ public class BRoom {
         }
 
         public void run() {
-            if (timer == 0) {
-                for (UUID player : players) {
-                    Bukkit.getPlayer(player).teleport(spawn);
-                    msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
+            if(!bRoom.getStop()){
+                if (timer == 0) {
+                    for (UUID player : players) {
+                        Bukkit.getPlayer(player).teleport(spawn);
+                        msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
+                    }
                     bossesAPI.getBoss(getBossType()).spawn(bossLocation);
+                    bRoom.state = BRoomState.STARTED;
+                    Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
+                    cancel();
                 }
-                bRoom.state = BRoomState.STARTED;
-                Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
+
+                if (countingNums.contains(timer)) {
+                    for (UUID player : players){
+                        msg.send(Bukkit.getPlayer(player), "d", message.replace("%t", timer + ""));
+                    }
+                }
+                timer--;
+            }else{
                 cancel();
             }
-
-            if (countingNums.contains(timer)) {
-                for (UUID player : players){
-                    msg.send(Bukkit.getPlayer(player), "d", message.replace("%t", timer + ""));
-                }
-            }
-            timer--;
-        }
-        //TODO fix timer still running when player executed /quit when respawn counting down.
-        public void stop(){
-            cancel();
         }
     }
 
