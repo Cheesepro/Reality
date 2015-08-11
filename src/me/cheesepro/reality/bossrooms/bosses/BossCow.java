@@ -79,6 +79,8 @@ public class BossCow implements Bosses {
         cow.setAgeLock(true);
         cow.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 70, 1));
         bossesAPI.basicSetup(cow, name, health);
+
+        //TODO use citizen's API to add custom path finding and attacking player feature
     }
 
     public void spawn(Location loc){
