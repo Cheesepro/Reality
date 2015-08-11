@@ -5,6 +5,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.BRoomIdleListeners;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.utils.DataManager;
@@ -86,6 +87,7 @@ public class BRoom {
     }
 
     public void addPlayer(Player p){
+        bRoomIdle.addIdleCountDown(p.getUniqueId());
         if(currentPlayers >= maxPlayer){
             msg.send(p, "c", "Sorry this room is already FULL!");
             return;

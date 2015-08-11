@@ -259,6 +259,8 @@ public class Reality extends JavaPlugin implements Listener{
         new PlayerQuitListener();
         new BRoomUpdateListener();
         new BRoomShopInvListener(this);
+        new BRoomIdleListeners(this);
+        //BRoomIdleListeners(Reality) is registered in BRoom.java
     }
 
     private void registerAbilities(){
