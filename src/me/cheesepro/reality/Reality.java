@@ -5,6 +5,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.abilities.*;
 import me.cheesepro.reality.bossrooms.*;
 import me.cheesepro.reality.bossrooms.bosses.*;
+import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.commands.CommandsManager;
 import me.cheesepro.reality.level.LevelLimiter;
@@ -175,6 +176,11 @@ public class Reality extends JavaPlugin implements Listener{
      */
     private Bosses[] bosses = new Bosses[9];
 
+    /*
+     * Boss room idle manager register
+     */
+    private BRoomIdle bRoomIdle = new BRoomIdle(this);
+
     private Logger logger = new Logger();
 
     private ConfigManager configManager;
@@ -260,7 +266,6 @@ public class Reality extends JavaPlugin implements Listener{
         new BRoomUpdateListener();
         new BRoomShopInvListener(this);
         new BRoomIdleListeners(this);
-        //BRoomIdleListeners(Reality) is registered in BRoom.java
     }
 
     private void registerAbilities(){
@@ -725,5 +730,9 @@ public class Reality extends JavaPlugin implements Listener{
 
     public Bosses[] getBosses(){
         return bosses;
+    }
+
+    public BRoomIdle getbRoomIdle(){
+        return bRoomIdle;
     }
 }

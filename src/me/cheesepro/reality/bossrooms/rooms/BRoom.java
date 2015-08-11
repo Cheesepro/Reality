@@ -5,7 +5,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bossrooms.BRoomIdleListeners;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.utils.DataManager;
@@ -25,7 +24,7 @@ import java.util.*;
  * Created by Mark on 2015-07-28.
  */
 public class BRoom {
-    public enum BRoomState {DISABLED, READY, LOBBY, STARTED, COUNTING_DOWN;}
+    public enum BRoomState {DISABLED, READY, LOBBY, STARTED, COUNTING_DOWN}
     private BRoomState state = BRoomState.DISABLED;
     private Reality plugin = Reality.getPlugin();
     private Location spawn, lobby, end, spectate, bossLocation;
@@ -87,7 +86,6 @@ public class BRoom {
     }
 
     public void addPlayer(Player p){
-        bRoomIdle.addIdleCountDown(p.getUniqueId());
         if(currentPlayers >= maxPlayer){
             msg.send(p, "c", "Sorry this room is already FULL!");
             return;
@@ -103,12 +101,14 @@ public class BRoom {
         p.teleport(lobby);
         state = BRoomState.LOBBY;
         currentPlayers++;
+        dataManager.getbRoomIdle().addIdleCountDown(p.getUniqueId());
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
         //TODO add Sign support
 
     }
 
     public void disconnectPlayer(Player p){
+        dataManager.getbRoomIdle().removePlayer(p);
         players.remove(p.getUniqueId());
         currentPlayers--;
         dataManager.removePlayerRole(p.getUniqueId());
@@ -119,6 +119,7 @@ public class BRoom {
     }
 
     public void removePlayer(Player p){
+        dataManager.getbRoomIdle().removePlayer(p);
         if(dataManager.getBRoomPlayersRole(p.getUniqueId())){
             stop();
         }else{
@@ -319,7 +320,7 @@ public class BRoom {
         private int timer;
         private String message;
         private BRoom bRoom;
-        private ArrayList<Integer> countingNums;
+        private List<Integer> countingNums;
 
         public Countdown(boolean stop, int start, String message, BRoom bRoom, int... countingNums) {
             if(stop){
@@ -328,7 +329,7 @@ public class BRoom {
                 this.timer = start;
                 this.message = message;
                 this.bRoom = bRoom;
-                this.countingNums = new ArrayList<Integer>();
+                this.countingNums = new ArrayList<>();
                 for (int i : countingNums) this.countingNums.add(i);
             }
         }

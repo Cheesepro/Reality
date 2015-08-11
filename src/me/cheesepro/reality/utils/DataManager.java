@@ -2,7 +2,9 @@ package me.cheesepro.reality.utils;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.BRoomIdle;
 import me.cheesepro.reality.bossrooms.Bosses;
+import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -39,8 +41,9 @@ public class DataManager {
     private Map<UUID, Boolean> bRoomPlayersRole;
     private Map<UUID, String> bRoomPlayersRoom;
     private Map<String, Integer> bRoomWinCount;
+    private BRoomIdle bRoomIdle;
 
-    Bosses[] bosses;
+    private Bosses[] bosses;
 
     private WorldGuardPlugin worldGuard;
 
@@ -81,6 +84,7 @@ public class DataManager {
         storageConfig = plugin.getStorageConfig();
         cratesConfig = plugin.getCratesConfig();
         bossRoomsConfig = plugin.getBossRoomsConfig();
+        bRoomIdle = plugin.getbRoomIdle();
     }
 
     public String getBossesWorld(){
@@ -231,6 +235,10 @@ public class DataManager {
 
     public Boolean playerHasEnoughMoney(Player p, Double amount){
         return economy.getBalance(Bukkit.getOfflinePlayer(p.getUniqueId()))>=amount;
+    }
+
+    public BRoomIdle getbRoomIdle(){
+        return bRoomIdle;
     }
 
 }

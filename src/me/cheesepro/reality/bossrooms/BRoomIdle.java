@@ -17,7 +17,6 @@ import java.util.UUID;
  */
 public class BRoomIdle {
     private Reality plugin;
-    private DataManager dataManager;
     private BRoomManager bRoomManager;
     private static Map<UUID, Integer> idleCount = new HashMap<UUID, Integer>();
     private static boolean isIdleTaskRunning;
@@ -25,11 +24,8 @@ public class BRoomIdle {
 
     public BRoomIdle(Reality plugin){
         this.plugin = plugin;
-        dataManager = new DataManager(plugin);
         bRoomManager = new BRoomManager(plugin);
         msg = new Messenger(plugin);
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-
     }
 
     public void addIdleCountDown(final UUID id){
@@ -54,7 +50,7 @@ public class BRoomIdle {
                     for(UUID uuid : idleCount.keySet()){
                         idleCount.put(uuid, idleCount.get(uuid)-1);
                         if(idleCount.get(uuid)<=10){
-                            msg.send(Bukkit.getPlayer(id), "4", "You will be kicked from the room for idling too long in"+idleCount.get(uuid)+" !");
+                            msg.send(Bukkit.getPlayer(id), "4", "You will be kicked from the room for idling too long in "+idleCount.get(uuid)+" second(s)!");
                         }
                     }
                 }
@@ -63,7 +59,7 @@ public class BRoomIdle {
         }
     }
 
-    private void setIdle(Player p, int value){
+    public void setIdle(Player p, int value){
         idleCount.put(p.getUniqueId(), value);
     }
 
