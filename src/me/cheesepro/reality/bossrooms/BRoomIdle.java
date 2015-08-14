@@ -28,7 +28,7 @@ public class BRoomIdle {
     }
 
     public void addIdleCountDown(final UUID id){
-        idleCount.put(id, 120);
+        setIdle(Bukkit.getPlayer(id), bRoomManager.getBRoom(Bukkit.getPlayer(id)).getIdleTimeout());
         if(!isIdleTaskRunning){
             new BukkitRunnable()
             {
