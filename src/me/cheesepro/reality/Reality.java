@@ -210,7 +210,7 @@ public class Reality extends JavaPlugin implements Listener{
             setupEconomy();
             registerCommands();
             registerListeners();
-            BossesSetup bossesSetup = new BossesSetup();
+//            BossesSetup bossesSetup = new BossesSetup();
             //TODO enable bossesSetup after finished
             if(getWorldEdit()==null){
                 logger.warn("WorldEdit dependency not found!");

@@ -26,7 +26,7 @@ public class BossZombie implements Bosses {
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
     Double rewardMoney = 9000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, name);
+    NPC npc;
 
     public BossZombie(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossZombie implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, name);
         return npc;
     }
 

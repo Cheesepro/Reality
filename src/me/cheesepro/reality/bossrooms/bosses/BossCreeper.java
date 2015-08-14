@@ -26,7 +26,7 @@ public class BossCreeper implements Bosses {
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
     Double rewardMoney = 9000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.CREEPER, name);
+    NPC npc;
 
     public BossCreeper(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossCreeper implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.CREEPER, name);
         return npc;
     }
 

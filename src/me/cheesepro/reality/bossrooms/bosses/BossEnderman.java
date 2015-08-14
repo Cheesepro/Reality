@@ -26,7 +26,7 @@ public class BossEnderman implements Bosses {
     Integer rewardXP = 5000;
     Integer rewardKey = 2;
     Double rewardMoney = 5000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ENDERMAN, name);
+    NPC npc;
     
     public BossEnderman(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossEnderman implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ENDERMAN, name);
         return npc;
     }
 

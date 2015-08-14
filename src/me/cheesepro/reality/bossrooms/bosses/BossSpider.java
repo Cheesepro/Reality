@@ -26,7 +26,7 @@ public class BossSpider implements Bosses {
     Integer rewardXP = 7000;
     Integer rewardKey = 3;
     Double rewardMoney = 7000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.SPIDER, name);
+    NPC npc;
 
     public BossSpider(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossSpider implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.SPIDER, name);
         return npc;
     }
 

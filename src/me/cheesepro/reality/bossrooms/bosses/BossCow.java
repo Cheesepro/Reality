@@ -26,7 +26,7 @@ public class BossCow implements Bosses {
     Integer rewardXP = 1500;
     Integer rewardKey = 1;
     Double rewardMoney = 1500.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.COW, name);
+    NPC npc;
 
     public BossCow(Reality plugin) {
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossCow implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.COW, name);
         return npc;
     }
 

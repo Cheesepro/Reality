@@ -26,7 +26,7 @@ public class BossPig implements Bosses {
     Integer rewardXP = 2500;
     Integer rewardKey = 1;
     Double rewardMoney = 2500.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PIG, name);
+    NPC npc;
 
     public BossPig(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossPig implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PIG, name);
         return npc;
     }
 

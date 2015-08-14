@@ -26,7 +26,7 @@ public class BossSkeleton implements Bosses {
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
     Double rewardMoney = 9000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.SKELETON, name);
+    NPC npc;
 
     public BossSkeleton(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossSkeleton implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.SKELETON, name);
         return npc;
     }
 

@@ -26,7 +26,7 @@ public class BossChicken implements Bosses{
     Integer rewardXP = 1000;
     Integer rewardKey = 1;
     Double rewardMoney = 1000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.CHICKEN, name);
+    NPC npc;
 
     public BossChicken(Reality plugin){
         this.plugin = plugin;
@@ -74,6 +74,7 @@ public class BossChicken implements Bosses{
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.CHICKEN, name);
         return npc;
     }
 

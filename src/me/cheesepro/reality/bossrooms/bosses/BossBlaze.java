@@ -26,7 +26,7 @@ public class BossBlaze implements Bosses {
     Integer rewardXP = 15000;
     Integer rewardKey = 10;
     Double rewardMoney = 15000.0;
-    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.BLAZE, name);
+    NPC npc;
 
     public BossBlaze(Reality plugin){
         this.plugin = plugin;
@@ -75,6 +75,7 @@ public class BossBlaze implements Bosses {
 
     @Override
     public NPC getNPC() {
+        npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.BLAZE, name);
         return npc;
     }
 

@@ -80,7 +80,6 @@ public class BRoom {
         idleTimeout = Integer.parseInt(dataManager.getBRoomsSettings(name).get("idletimeout"));
         bossType = dataManager.getBRoomBoss(name);
         state = BRoomState.READY;
-        bossNPC = bossesAPI.getBoss(getBossType()).getNPC();
     }
 
     public String getBRoomName(){
@@ -348,6 +347,7 @@ public class BRoom {
                         Bukkit.getPlayer(player).teleport(spawn);
                         msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
                     }
+                    bossNPC = bossesAPI.getBoss(getBossType()).getNPC();
                     bossesAPI.getBoss(getBossType()).spawn(bossLocation);
                     bossesPathFinding.startPathFinding(bossNPC, getBRoomName());
                     //TODO Remove boss path finder after boss die or end game
