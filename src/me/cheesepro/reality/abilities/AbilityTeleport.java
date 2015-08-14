@@ -79,7 +79,7 @@ public class AbilityTeleport implements Abilities, Listener{
                         Double y = Math.sin(pitch) * Math.sin(yaw);
                         Double z = Math.cos(pitch);
                         Vector vector = new Vector(x, z, y);
-                        p.setVelocity(vector.multiply(10));
+                        p.setVelocity(vector.multiply(5));
                         p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 4 + 10, 8));
                         cooldownTime.put(p, Integer.parseInt(abilitiesOptions.get("TELEPORT").get("cooldown")));
                         cooldownTask.put(p, new BukkitRunnable() {

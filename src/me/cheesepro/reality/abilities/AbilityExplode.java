@@ -6,13 +6,11 @@ import me.cheesepro.reality.utils.Tools;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -75,8 +73,6 @@ public class AbilityExplode implements Abilities, Listener{
                             return;
                         }
                         World world = p.getWorld();
-                        world.spawn(p.getLocation(), TNTPrimed.class).setFuseTicks(30);
-                        world.spawn(p.getLocation(), TNTPrimed.class).setFuseTicks(30);
                         world.spawn(p.getLocation(), TNTPrimed.class).setFuseTicks(30);
                         p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 4 + 10, 8));
 
