@@ -1,6 +1,7 @@
 package me.cheesepro.reality.bossrooms;
 
 import me.cheesepro.reality.Reality;
+import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Damageable;
@@ -24,6 +25,15 @@ public class BossesAPI {
         animals.setHealth(health * 2.0);
         animals.setCustomName(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + name);
         animals.setCustomNameVisible(true);
+    }
+
+    public void basicSetup(Creature animals, int health) {
+        animals.setMaxHealth(health * 2.0);
+        animals.setHealth(health * 2.0);
+        if(!animals.getCustomName().contains(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS")){
+            CitizensAPI.getNPCRegistry().getNPC(animals).setName(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + animals.getCustomName());
+            animals.setCustomNameVisible(true);
+        }
     }
 
     public Bosses getBoss(String type){

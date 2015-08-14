@@ -3,10 +3,13 @@ package me.cheesepro.reality.bossrooms.bosses;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Pig;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EntityType;
 
 
 /**
@@ -23,6 +26,7 @@ public class BossPig implements Bosses {
     Integer rewardXP = 2500;
     Integer rewardKey = 1;
     Double rewardMoney = 2500.0;
+    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.PIG, name);
 
     public BossPig(Reality plugin){
         this.plugin = plugin;
@@ -70,12 +74,17 @@ public class BossPig implements Bosses {
     }
 
     @Override
+    public NPC getNPC() {
+        return npc;
+    }
+
+    @Override
     public void spawn(String w, double x, double y, double z, float pitch, float yaw){
         Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
-        Pig pig = loc.getWorld().spawn(loc, Pig.class);
-        pig.setBreed(false);
-        pig.setAgeLock(true);
-        bossesAPI.basicSetup(pig, name, health);
+        npc.spawn(loc);
+        npc.setProtected(false);
+        Creature creature = (Creature) npc.getEntity();
+        bossesAPI.basicSetup(creature, health);
     }
 
     public void spawn(Location loc){

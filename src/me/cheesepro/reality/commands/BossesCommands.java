@@ -356,7 +356,6 @@ public class BossesCommands {
             }else{
                 msg.send(p, "e", bRoom + " is not a valid boss room!");
             }
-            //TODO add boss room purchase features both command and gui
         }
     }
 

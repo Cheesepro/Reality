@@ -5,6 +5,7 @@ import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
+import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
@@ -50,8 +51,9 @@ public class BRoomBossesDieListener implements Listener {
     public void onBossDie(EntityDeathEvent e){
         for(BRoom bRoom : bRoomManager.getBRooms()) {
             if (isEntityBoss(e, bossesAPI.getBoss(bRoom.getBossType()).getName())) {
+                CitizensAPI.getNPCRegistry().getNPC(e.getEntity()).destroy();
                 dataManager.addBRoomWinCount(bRoom.getBRoomName(), 1);
-                bRoom.bossDie();
+                bRoom.bossDie(e.getEntity());
                 for(UUID id : bRoom.getPlayers()){
                     msg.send(Bukkit.getPlayer(id), "a", "Boss " + bRoom.getBossType() + " got beaten " + dataManager.getBRoomWinCount(bRoom.getBRoomName()) + " times!");
                 }

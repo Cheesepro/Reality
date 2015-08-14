@@ -3,12 +3,13 @@ package me.cheesepro.reality.bossrooms.bosses;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Cow;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EntityType;
 
 
 /**
@@ -25,6 +26,7 @@ public class BossCow implements Bosses {
     Integer rewardXP = 1500;
     Integer rewardKey = 1;
     Double rewardMoney = 1500.0;
+    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.COW, name);
 
     public BossCow(Reality plugin) {
         this.plugin = plugin;
@@ -72,15 +74,17 @@ public class BossCow implements Bosses {
     }
 
     @Override
+    public NPC getNPC() {
+        return npc;
+    }
+
+    @Override
     public void spawn(String w, double x, double y, double z, float pitch, float yaw){
         Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
-        Cow cow = loc.getWorld().spawn(loc, Cow.class);
-        cow.setBreed(false);
-        cow.setAgeLock(true);
-        cow.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 70, 1));
-        bossesAPI.basicSetup(cow, name, health);
-
-        //TODO use citizen's API to add custom path finding and attacking player feature
+        npc.spawn(loc);
+        npc.setProtected(false);
+        Creature creature = (Creature) npc.getEntity();
+        bossesAPI.basicSetup(creature, health);
     }
 
     public void spawn(Location loc){

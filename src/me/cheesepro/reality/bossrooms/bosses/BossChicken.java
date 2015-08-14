@@ -3,10 +3,13 @@ package me.cheesepro.reality.bossrooms.bosses;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EntityType;
 
 
 /**
@@ -23,6 +26,7 @@ public class BossChicken implements Bosses{
     Integer rewardXP = 1000;
     Integer rewardKey = 1;
     Double rewardMoney = 1000.0;
+    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.CHICKEN, name);
 
     public BossChicken(Reality plugin){
         this.plugin = plugin;
@@ -69,14 +73,18 @@ public class BossChicken implements Bosses{
     }
 
     @Override
-    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
-        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
-        Chicken chicken = loc.getWorld().spawn(loc, Chicken.class);
-        chicken.setBreed(false);
-        chicken.setAgeLock(true);
-        bossesAPI.basicSetup(chicken, name, health);
+    public NPC getNPC() {
+        return npc;
     }
 
+    @Override
+    public void spawn(String w, double x, double y, double z, float pitch, float yaw){
+        Location loc = new Location(Bukkit.getWorld(w), x, y, z, pitch, yaw);
+        npc.spawn(loc);
+        npc.setProtected(false);
+        Creature creature = (Creature) npc.getEntity();
+        bossesAPI.basicSetup(creature, health);
+    }
     public void spawn(Location loc){
         spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
     }

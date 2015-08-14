@@ -1,20 +1,11 @@
 package me.cheesepro.reality.bossrooms;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.DataManager;
-import me.cheesepro.reality.utils.Messenger;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by Mark on 2015-08-10.
@@ -47,7 +38,11 @@ public class BRoomIdleListeners implements Listener{
     public void onPlayerMove(PlayerMoveEvent e)
     {
         if(dataManager.getInGamePlayersList().contains(e.getPlayer().getUniqueId())){
-            bRoomIdle.setIdle(e.getPlayer(), bRoomManager.getBRoom(e.getPlayer()).getIdleTimeout());
+            int movX = e.getFrom().getBlockX() - e.getTo().getBlockX();
+            int movZ = e.getFrom().getBlockZ() - e.getTo().getBlockZ();
+            if ((Math.abs(movX) > 0) || (Math.abs(movZ) > 0)) {
+                bRoomIdle.setIdle(e.getPlayer(), bRoomManager.getBRoom(e.getPlayer()).getIdleTimeout());
+            }
         }
     }
 

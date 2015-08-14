@@ -5,17 +5,16 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.abilities.*;
 import me.cheesepro.reality.bossrooms.*;
 import me.cheesepro.reality.bossrooms.bosses.*;
-import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.commands.CommandsManager;
 import me.cheesepro.reality.level.LevelLimiter;
+import me.cheesepro.reality.level.XPGainListener;
 import me.cheesepro.reality.listeners.*;
 import me.cheesepro.reality.luckycrates.KeysGiver;
 import me.cheesepro.reality.luckycrates.LuckyCrates;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.ConfigManager;
 import me.cheesepro.reality.utils.Logger;
-import me.cheesepro.reality.level.XPGainListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -205,13 +204,14 @@ public class Reality extends JavaPlugin implements Listener{
             bRoomManager = new BRoomManager(this);
             loadConfig();
             saveDefaultConfig();
+            registerBosses();
             cache();
             registerAbilities();
-            registerBosses();
             setupEconomy();
             registerCommands();
             registerListeners();
             BossesSetup bossesSetup = new BossesSetup();
+            //TODO enable bossesSetup after finished
             if(getWorldEdit()==null){
                 logger.warn("WorldEdit dependency not found!");
             }

@@ -2,7 +2,6 @@ package me.cheesepro.reality.bossrooms;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
-import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -37,15 +36,21 @@ public class BRoomIdle {
                 public void run()
                 {
                     isIdleTaskRunning=true;
-                    if(idleCount.containsKey(id) && idleCount.get(id)==0){
-                        bRoomManager.getBRoom(Bukkit.getPlayer(id)).removePlayer(Bukkit.getPlayer(id));
-                        msg.send(Bukkit.getPlayer(id), "4", "You are kicked from the game for idling too long!");
-                        idleCount.remove(id);
-                    }
+                    System.out.print(idleCount);
                     if(idleCount.isEmpty() || idleCount.toString().equalsIgnoreCase("{}"))
                     {
                         isIdleTaskRunning=false;
                         cancel();
+                    }
+                    if(idleCount.containsKey(id)){
+                        if(bRoomManager.getBRoom(Bukkit.getPlayer(id))!=null){
+                            if(idleCount.get(id)==1){
+                                bRoomManager.getBRoom(Bukkit.getPlayer(id)).removePlayer(Bukkit.getPlayer(id));
+                                msg.send(Bukkit.getPlayer(id), "4", "You are kicked from the game for idling too long!");
+                            }
+                        }else{
+                            idleCount.remove(id);
+                        }
                     }
                     for(UUID uuid : idleCount.keySet()){
                         idleCount.put(uuid, idleCount.get(uuid)-1);

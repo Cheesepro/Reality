@@ -4,7 +4,7 @@
  author: Cheesepro
  website: http://RealityMC.com
  main: me.cheesepro.reality.Reality
- depend: [Vault, WorldGuard, WorldEdit, PermissionsEx]
+ depend: [Vault, WorldGuard, WorldEdit, PermissionsEx, Citizens]
 
  commands:
    reality:

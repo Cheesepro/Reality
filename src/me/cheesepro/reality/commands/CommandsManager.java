@@ -47,6 +47,7 @@ public class CommandsManager implements CommandExecutor{
             Player p = (Player) sender;
             if(cmd.getLabel().equalsIgnoreCase("reality")){
                 if(args.length==0){
+
                     if(pManager.hasDefaultPermission(p)){
 
                     }else if(pManager.hasAdminPermission(p)){

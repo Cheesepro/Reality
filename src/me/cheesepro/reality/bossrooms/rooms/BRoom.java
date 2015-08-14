@@ -6,10 +6,13 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import me.cheesepro.reality.bossrooms.BossesPathFinding;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
 import me.cheesepro.reality.utils.PlayerManager;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,6 +40,8 @@ public class BRoom {
     private PlayerManager pManager = new PlayerManager(plugin);
     private WorldGuardPlugin worldGuard = plugin.getWorldGuard();
     private Boolean stop = false;
+    private BossesPathFinding bossesPathFinding = new BossesPathFinding(plugin);
+    private NPC bossNPC;
 
     public BRoom(String name) {
         BRoomName = name;
@@ -75,6 +80,7 @@ public class BRoom {
         idleTimeout = Integer.parseInt(dataManager.getBRoomsSettings(name).get("idletimeout"));
         bossType = dataManager.getBRoomBoss(name);
         state = BRoomState.READY;
+        bossNPC = bossesAPI.getBoss(getBossType()).getNPC();
     }
 
     public String getBRoomName(){
@@ -174,7 +180,9 @@ public class BRoom {
         }
     }
 
-    public void bossDie(){
+    public void bossDie(Entity entity){
+        bossesPathFinding.stopPathFinding(bossNPC);
+        CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
         new Countdown(
                 false,
                 10,
@@ -191,6 +199,7 @@ public class BRoom {
 
     public void stop(){
         stop = true;
+        bossesPathFinding.stopPathFinding(bossNPC);
         ProtectedRegion rg = worldGuard.getRegionManager(Bukkit.getWorld(dataManager.getBossesWorld())).getRegion("reality_bossroom_" + getBRoomName());
         if(rg!=null){
             Region region = new CuboidRegion(rg.getMaximumPoint(), rg.getMinimumPoint());
@@ -198,10 +207,8 @@ public class BRoom {
             Collection<Entity> entities = Bukkit.getWorld(dataManager.getBossesWorld()).getNearbyEntities(centerLoc, region.getWidth() / 2, region.getHeight() / 2, region.getLength() / 2);
             for(Entity entity : entities){
                 if(entity!=null){
-                    if(entity.getCustomName()!=null){
-                        if(entity.getCustomName().equalsIgnoreCase(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS " + ChatColor.BOLD + bossesAPI.getBoss(getBossType()).getName())){
-                            entity.remove();
-                        }
+                    if(entity.hasMetadata("NPC")) {
+                        CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
                     }
                 }
             }
@@ -329,7 +336,7 @@ public class BRoom {
                 this.timer = start;
                 this.message = message;
                 this.bRoom = bRoom;
-                this.countingNums = new ArrayList<>();
+                this.countingNums = new ArrayList<Integer>();
                 for (int i : countingNums) this.countingNums.add(i);
             }
         }
@@ -342,6 +349,9 @@ public class BRoom {
                         msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
                     }
                     bossesAPI.getBoss(getBossType()).spawn(bossLocation);
+                    bossesPathFinding.startPathFinding(bossNPC, getBRoomName());
+                    //TODO Remove boss path finder after boss die or end game
+                    //TODO Fix player do no damage to boss due to worldguard flags
                     bRoom.state = BRoomState.STARTED;
                     Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
                     cancel();

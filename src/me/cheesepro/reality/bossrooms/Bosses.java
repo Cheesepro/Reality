@@ -1,6 +1,7 @@
 package me.cheesepro.reality.bossrooms;
 
 
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Location;
 
 /**
@@ -8,24 +9,26 @@ import org.bukkit.Location;
  */
 public interface Bosses {
 
-    public String getType();
+    String getType();
 
-    public String getName();
+    String getName();
 
-    public String getSkills();
+    String getSkills();
 
-    public Integer getHealth();
+    Integer getHealth();
 
-    public Integer getDamage();
+    Integer getDamage();
 
-    public Integer getRewardXP();
+    Integer getRewardXP();
 
-    public Integer getRewardKey();
+    Integer getRewardKey();
 
-    public Double getRewardMoney();
+    Double getRewardMoney();
 
-    public void spawn(String w, double x, double y, double z, float pitch, float yaw);
+    void spawn(String w, double x, double y, double z, float pitch, float yaw);
 
-    public void spawn(Location loc);
+    void spawn(Location loc);
+
+    NPC getNPC();
 
 }
