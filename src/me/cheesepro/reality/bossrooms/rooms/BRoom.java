@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -209,6 +210,9 @@ public class BRoom {
                     if(entity.hasMetadata("NPC")) {
                         CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
                     }
+                    if(entity instanceof Item){
+                        entity.remove();
+                    }
                 }
             }
         }
@@ -350,7 +354,6 @@ public class BRoom {
                     bossNPC = bossesAPI.getBoss(getBossType()).getNPC();
                     bossesAPI.getBoss(getBossType()).spawn(bossLocation);
                     bossesPathFinding.startPathFinding(bossNPC, getBRoomName());
-                    //TODO Remove boss path finder after boss die or end game
                     //TODO Fix player do no damage to boss due to worldguard flags
                     bRoom.state = BRoomState.STARTED;
                     Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());

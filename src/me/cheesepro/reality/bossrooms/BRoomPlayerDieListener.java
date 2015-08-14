@@ -27,17 +27,17 @@ public class BRoomPlayerDieListener implements Listener{
     @EventHandler
     public void onPlayerDie(final PlayerDeathEvent e){
         if(bRoomManager.getBRoom(e.getEntity())==null) return;
-        e.getEntity().spigot().respawn();
-        e.getEntity().setCanPickupItems(false);
         new BukkitRunnable() {
             @Override
             public void run() {
+                e.getEntity().spigot().respawn();
+                e.getEntity().setCanPickupItems(false);
                 if(!dataManager.getBRoomPlayersRole(e.getEntity().getUniqueId())){
                     e.getEntity().teleport(bRoomManager.getBRoom(e.getEntity()).getSpectate());
                 }
                 bRoomManager.getBRoom(e.getEntity()).playerDie(e.getEntity());
             }
-        }.runTaskLater(plugin, 20);
+        }.runTaskLater(plugin, 5);
     }
 
 }
