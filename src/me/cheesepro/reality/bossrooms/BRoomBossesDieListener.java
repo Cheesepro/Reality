@@ -51,6 +51,8 @@ public class BRoomBossesDieListener implements Listener {
     public void onBossDie(EntityDeathEvent e){
         for(BRoom bRoom : bRoomManager.getBRooms()) {
             if (isEntityBoss(e, bossesAPI.getBoss(bRoom.getBossType()).getName())) {
+                e.getDrops().clear();
+                e.setDroppedExp(0);
                 CitizensAPI.getNPCRegistry().getNPC(e.getEntity()).destroy();
                 dataManager.addBRoomWinCount(bRoom.getBRoomName(), 1);
                 bRoom.bossDie(e.getEntity());
