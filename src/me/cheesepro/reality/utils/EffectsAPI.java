@@ -18,7 +18,7 @@ public class EffectsAPI {
     private Tools tools;
     private List<Color> randomColors = new ArrayList<Color>();
 
-    private enum PlayEffect {EXPLODE, LOVE, MUSIC, SMOKE, };
+    public enum PlayEffect{EXPLODE, LOVE, MUSIC, SMOKE, CLOUD, ENDER, CRIT, FIRE}
 
     public EffectsAPI(Reality plugin){
         this.plugin = plugin;
@@ -58,8 +58,25 @@ public class EffectsAPI {
         f.setFireworkMeta(fm);
     }
 
-    public void effect(Location loc, Effect effect){
-        loc.getWorld().playEffect(loc, effect, effect.getData());
+    public void effect(Location loc, PlayEffect playEffect){
+        switch (playEffect){
+            case CRIT: for(int i = 0; i<10; i++){loc.getWorld().playEffect(loc, Effect.CRIT, null);}
+                break;
+            case CLOUD: for(int i = 0; i<25; i++){loc.getWorld().playEffect(loc, Effect.CLOUD, null);}
+                break;
+            case ENDER: for(int i = 0; i<25; i++){loc.getWorld().playEffect(loc, Effect.ENDER_SIGNAL, null);}
+                break;
+            case EXPLODE: loc.getWorld().playEffect(loc, Effect.EXPLOSION_HUGE, null);
+                break;
+            case LOVE: loc.getWorld().playEffect(loc, Effect.HEART, null);
+                break;
+            case MUSIC: loc.getWorld().playEffect(loc, Effect.NOTE, null);
+                break;
+            case SMOKE: for(int i = 0; i<25; i++){loc.getWorld().playEffect(loc, Effect.LARGE_SMOKE, null);}
+                break;
+            case FIRE:  for(int i = 0; i<3; i++){loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, null);}
+                break;
+        }
     }
 
     private Color getRandomColor(){
