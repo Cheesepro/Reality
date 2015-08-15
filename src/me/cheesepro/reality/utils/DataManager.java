@@ -4,7 +4,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.BRoomIdle;
 import me.cheesepro.reality.bossrooms.Bosses;
-import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -239,6 +238,16 @@ public class DataManager {
 
     public BRoomIdle getbRoomIdle(){
         return bRoomIdle;
+    }
+
+    public List<String> getAbilitiesItemNames(){
+        List<String> temp = new ArrayList<String>();
+        for(String item : abilitiesOptions.keySet()){
+            if(abilitiesOptions.get(item).get("item_name")!=null){
+                temp.add(abilitiesOptions.get(item).get("item_name"));
+            }
+        }
+        return temp;
     }
 
 }

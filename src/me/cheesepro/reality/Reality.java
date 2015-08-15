@@ -261,7 +261,7 @@ public class Reality extends JavaPlugin implements Listener{
         new CratesBreakingPreventer(this);
         new BRoomBossesDieListener(this);
         new BRoomCommandsListener(this);
-        new BRoomPlayerDieListener(this);
+        new PlayerDeathListener(this);
         new PlayerQuitListener();
         new BRoomUpdateListener();
         new BRoomShopInvListener(this);

@@ -1,6 +1,7 @@
-package me.cheesepro.reality.bossrooms;
+package me.cheesepro.reality.listeners;
 
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.utils.DataManager;

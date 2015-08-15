@@ -110,7 +110,6 @@ public class BRoom {
         dataManager.getbRoomIdle().addIdleCountDown(p.getUniqueId());
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
         //TODO add Sign support
-
     }
 
     public void disconnectPlayer(Player p){
@@ -146,7 +145,6 @@ public class BRoom {
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
 
         //TODO add Sign support
-
     }
 
     public void start(){

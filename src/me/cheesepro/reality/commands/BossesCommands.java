@@ -9,7 +9,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bossrooms.BRoomUpdateListener;
+import me.cheesepro.reality.listeners.BRoomUpdateListener;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
