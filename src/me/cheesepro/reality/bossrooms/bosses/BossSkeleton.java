@@ -8,8 +8,10 @@ import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 
 /**
@@ -85,6 +87,14 @@ public class BossSkeleton implements Bosses {
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
+        creature.setFireTicks(0);
+        ItemStack chestplate = new ItemStack(Material.DIAMOND_CHESTPLATE);
+        ItemStack hat = new ItemStack(Material.DIAMOND_HELMET);
+        ItemStack boot = new ItemStack(Material.DIAMOND_BOOTS);
+        ItemStack legging = new ItemStack(Material.DIAMOND_LEGGINGS);
+        ItemStack sword = new ItemStack(Material.IRON_AXE);
+        creature.getEquipment().setHelmet(hat);
+        creature.getEquipment().setItemInHand(sword);
         bossesAPI.basicSetup(creature, health);
     }
 

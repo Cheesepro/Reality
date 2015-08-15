@@ -125,7 +125,6 @@ public class BRoom {
     }
 
     public void removePlayer(Player p){
-        dataManager.getbRoomIdle().removePlayer(p);
         if(dataManager.getBRoomPlayersRole(p.getUniqueId())){
             stop();
         }else{
@@ -226,6 +225,7 @@ public class BRoom {
             int rewardXP = Math.round(bossesAPI.getBoss(getBossType()).getRewardXP()/currentPlayers*dataManager.getBRoomWinCount(getBRoomName()));
             for(UUID id : players){
                 if(Bukkit.getPlayer(id)!=null){
+                    dataManager.getbRoomIdle().removePlayer(Bukkit.getPlayer(id));
                     Player p = Bukkit.getPlayer(id);
                     p.teleport(end);
                     if(dataManager.getBRoomPlayersRole(id)){
@@ -249,6 +249,7 @@ public class BRoom {
         }else{
             for(UUID id : players){
                 if(Bukkit.getPlayer(id)!=null){
+                    dataManager.getbRoomIdle().removePlayer(Bukkit.getPlayer(id));
                     msg.send(Bukkit.getPlayer(id), "d", "The boss was killed 0 times!");
                     Player p = Bukkit.getPlayer(id);
                     p.teleport(end);

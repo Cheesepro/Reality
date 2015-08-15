@@ -6,17 +6,17 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.DataManager;
+import me.cheesepro.reality.utils.EffectsAPI;
 import me.cheesepro.reality.utils.Messenger;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Mark on 2015-08-12.
@@ -29,12 +29,17 @@ public class BossesPathFinding {
     private Messenger msg;
     private WorldGuardPlugin worldGuard;
     private DataManager dataManager;
+    private Map<UUID, Integer> bossXLoc = new HashMap<UUID, Integer>();
+    private Map<UUID, Integer> bossZLoc = new HashMap<UUID, Integer>();
+    private Map<UUID, Double> bossStillCount = new HashMap<UUID, Double>();
+    private EffectsAPI effectsAPI;
 
     public BossesPathFinding(Reality plugin){
         this.plugin = plugin;
         msg = new Messenger(plugin);
         dataManager = new DataManager(plugin);
         worldGuard = plugin.getWorldGuard();
+        effectsAPI = new EffectsAPI(plugin);
     }
 
     public void startPathFinding(final NPC npc, final String bRoomName){
@@ -77,17 +82,42 @@ public class BossesPathFinding {
                                 if(npc1.isSpawned()){
                                     npc1.getNavigator().setTarget(target, true);
                                 }
+                                if(bossXLoc.containsKey(npc1.getUniqueId()) && bossZLoc.containsKey(npc1.getUniqueId())){
+                                    if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
+                                        if(bossStillCount.containsKey(npc1.getUniqueId())){
+                                            if(bossStillCount.get(npc1.getUniqueId())>=0.5*4){
+                                                effectsAPI.effect(npc.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
+                                                npc.teleport(centerLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                                bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                            }else{
+                                                bossStillCount.put(npc1.getUniqueId(), bossStillCount.get(npc1.getUniqueId())+0.5);
+                                            }
+                                        }else{
+                                            bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                        }
+                                    }else{
+                                        bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                        bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
+                                        bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
+                                    }
+                                }else{
+                                    bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
+                                    bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
+                                }
                             }
                         }
                     }
                 }
-            }.runTaskTimer(plugin, 0, 1);
-            //20 ticks = 1 sec;
+            }.runTaskTimer(plugin, 0, 10);
+            //10 ticks = 0.5 sec;
         }
     }
 
     public void stopPathFinding(NPC npc){
         bossNPCs.remove(npc);
+        bossXLoc.remove(npc.getUniqueId());
+        bossZLoc.remove(npc.getUniqueId());
+        bossStillCount.remove(npc.getUniqueId());
     }
 
 
