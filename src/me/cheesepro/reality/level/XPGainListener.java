@@ -103,9 +103,6 @@ public class XPGainListener implements Listener{
                             pManager.addXP(id, 16);
                         }
                         Bukkit.getServer().getPluginManager().callEvent(new PlayerKillMobEvent(p, e));
-                    } else {
-                        Player dPlayer = (Player) e;
-                        pManager.addXP(id, Integer.parseInt(String.valueOf(Math.round(Integer.parseInt(playersINFO.get(dPlayer.getUniqueId()).get("xp")) / 0.25))));
                     }
                 }
             }

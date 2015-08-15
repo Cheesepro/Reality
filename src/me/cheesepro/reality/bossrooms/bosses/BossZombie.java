@@ -21,8 +21,8 @@ public class BossZombie implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.DARK_GREEN.toString() + "Zombie";
     String skill = "Spawns multiple normal zombies and mobs the player";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 400;
+    Integer damage = 6;
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
     Double rewardMoney = 9000.0;

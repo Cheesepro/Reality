@@ -21,7 +21,7 @@ public class BossCow implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.GRAY.toString() + "Cow";
     String skill = "Potion of regeneration level 1 for the first 60 secs";
-    Integer health = 1;
+    Integer health = 75;
     Integer damage = 4;
     Integer rewardXP = 1500;
     Integer rewardKey = 1;

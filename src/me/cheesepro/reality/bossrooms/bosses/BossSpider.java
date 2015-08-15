@@ -21,8 +21,8 @@ public class BossSpider implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.DARK_GRAY.toString() + "Spider";
     String skill = "Can freeze the player once in a while";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 250;
+    Integer damage = 6;
     Integer rewardXP = 7000;
     Integer rewardKey = 3;
     Double rewardMoney = 7000.0;

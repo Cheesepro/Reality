@@ -21,8 +21,8 @@ public class BossSkeleton implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.GRAY.toString() + "Skeleton";
     String skill = "Can shoot flame arrows that ignites on impact";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 400;
+    Integer damage = 6;
     Integer rewardXP = 9000;
     Integer rewardKey = 5;
     Double rewardMoney = 9000.0;

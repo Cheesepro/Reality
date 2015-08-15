@@ -22,7 +22,7 @@ public class BossChicken implements Bosses{
     String name = ChatColor.WHITE.toString() + "Chicken";
     String skill = "None!";
     Integer health = 50;
-    Integer damage = 4;
+    Integer damage = 3;
     Integer rewardXP = 1000;
     Integer rewardKey = 1;
     Double rewardMoney = 1000.0;

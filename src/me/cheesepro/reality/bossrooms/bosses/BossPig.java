@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -21,8 +23,8 @@ public class BossPig implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.RED.toString() + "Pig";
     String skill = "Spawns a zombie once every 15 seconds to help him fight";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 100;
+    Integer damage = 5;
     Integer rewardXP = 2500;
     Integer rewardKey = 1;
     Double rewardMoney = 2500.0;
@@ -85,6 +87,8 @@ public class BossPig implements Bosses {
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 2);
+        creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
     }
 

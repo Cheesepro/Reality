@@ -81,7 +81,7 @@ public class BossesPathFinding {
                         }
                     }
                 }
-            }.runTaskTimer(plugin, 20, 20);
+            }.runTaskTimer(plugin, 0, 1);
             //20 ticks = 1 sec;
         }
     }

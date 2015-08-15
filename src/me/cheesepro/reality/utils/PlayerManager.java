@@ -2,11 +2,8 @@ package me.cheesepro.reality.utils;
 
 import me.cheesepro.reality.Reality;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +19,7 @@ public class PlayerManager {
     private Config storageConfig;
     private Messenger msg;
     private DataManager dataManager;
+    private EffectsAPI effectsAPI;
 
     public PlayerManager(Reality plugin){
         this.plugin = plugin;
@@ -30,6 +28,7 @@ public class PlayerManager {
         levels = plugin.getLevels();
         msg = new Messenger(plugin);
         dataManager = new DataManager(plugin);
+        effectsAPI = new EffectsAPI(plugin);
     }
 
     public String getRank(UUID id){
@@ -116,17 +115,9 @@ public class PlayerManager {
             String next = String.valueOf(nextH);
             if(Integer.parseInt(playersINFO.get(id).get("xp"))>=levels.get(next)){
                 setLevel(id, nextH);
-                Firework f = Bukkit.getPlayer(id).getWorld().spawn(Bukkit.getPlayer(id).getLocation(), Firework.class);
-                FireworkMeta fm = f.getFireworkMeta();
-                fm.addEffect(FireworkEffect.builder()
-                        .flicker(true)
-                        .trail(true)
-                        .with(FireworkEffect.Type.BALL_LARGE)
-                        .withColor(Color.NAVY)
-                        .withFade(Color.AQUA)
-                        .build());
-                fm.setPower(0);
-                f.setFireworkMeta(fm);
+                effectsAPI.firework(id, FireworkEffect.Type.STAR);
+                effectsAPI.firework(id, FireworkEffect.Type.BALL_LARGE);
+                effectsAPI.firework(id, FireworkEffect.Type.BURST);
                 GraphicalAPI.sendTitleToPlayer(Bukkit.getPlayer(id), 1, 8, 1, "&a&lLeveled up!", "&f&lYou are now level " + next);
                 msg.send(Bukkit.getPlayer(id), "d", "Leveled UP! You are now level " + next);
                 return "yes";

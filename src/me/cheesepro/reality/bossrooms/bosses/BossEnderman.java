@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -21,8 +23,8 @@ public class BossEnderman implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.LIGHT_PURPLE.toString() + "Enderman";
     String skill = "Once the boss is at 50% health, he will clone himself so that there are 2 bossrooms to kill with 25% of health each.";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 150;
+    Integer damage = 6;
     Integer rewardXP = 5000;
     Integer rewardKey = 2;
     Double rewardMoney = 5000.0;
@@ -85,6 +87,8 @@ public class BossEnderman implements Bosses {
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 2);
+        creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
     }
 

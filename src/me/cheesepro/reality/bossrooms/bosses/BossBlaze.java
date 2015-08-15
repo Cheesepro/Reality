@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -21,8 +23,8 @@ public class BossBlaze implements Bosses {
     BossesAPI bossesAPI;
     String name = ChatColor.GOLD.toString() + "Blaze";
     String skill = "Fires triple fireballs";
-    Integer health = 50;
-    Integer damage = 4;
+    Integer health = 500;
+    Integer damage = 3;
     Integer rewardXP = 15000;
     Integer rewardKey = 10;
     Double rewardMoney = 15000.0;
@@ -85,6 +87,8 @@ public class BossBlaze implements Bosses {
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 10);
+        creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
     }
 
