@@ -79,6 +79,7 @@ public class JoinListener implements Listener{
         }else{
             if(dataManager.containsQuitBRoom(p)){
                 p.teleport(bRoomManager.getBRoom(dataManager.getQuitBRoom(p)).getEnd());
+                dataManager.removeQuitBRoom(p);
                 new BukkitRunnable(){
                     @Override
                     public void run(){

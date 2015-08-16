@@ -215,7 +215,7 @@ public class BRoom {
                 }
             }
         }
-        if(dataManager.getBRoomWinCount(getBRoomName())!=null && dataManager.getBRoomWinCount(getBRoomName())!=0){
+        if(dataManager.getBRoomWinCount(getBRoomName())!=null && dataManager.getBRoomWinCount(getBRoomName())!=0 && currentPlayers!=0){
             Set<String> pNames = new HashSet<String>();
             for(UUID id : players){
                 pNames.add(Bukkit.getPlayer(id).getName());

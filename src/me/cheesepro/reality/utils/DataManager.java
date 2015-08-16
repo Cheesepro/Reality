@@ -6,6 +6,7 @@ import me.cheesepro.reality.bossrooms.BRoomIdle;
 import me.cheesepro.reality.bossrooms.Bosses;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -246,7 +247,7 @@ public class DataManager {
         List<String> temp = new ArrayList<String>();
         for(String item : abilitiesOptions.keySet()){
             if(abilitiesOptions.get(item).get("item_name")!=null){
-                temp.add(abilitiesOptions.get(item).get("item_name"));
+                temp.add(ChatColor.translateAlternateColorCodes('&',abilitiesOptions.get(item).get("item_name")));
             }
         }
         return temp;
