@@ -82,7 +82,7 @@ public class RankGiver {
                 if(splits[2]!=null){
                     itemName = splits[2];
                 }
-                im.setDisplayName(itemName);
+                im.setDisplayName(ChatColor.translateAlternateColorCodes('&',itemName));
                 item.setItemMeta(im);
                 p.getInventory().addItem(item);
             }
@@ -104,7 +104,7 @@ public class RankGiver {
                 if(splits[1]!=null){
                     itemName = splits[1];
                 }
-                im.setDisplayName(itemName);
+                im.setDisplayName(ChatColor.translateAlternateColorCodes('&',itemName));
                 item.setItemMeta(im);
                 p.getInventory().addItem(item);
             }

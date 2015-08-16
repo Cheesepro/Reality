@@ -2,6 +2,7 @@ package me.cheesepro.reality.utils;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.abilities.AbilitiesINFO;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class Tools {
             if(kitCache.startsWith(itemName)){
                 String[] splits = kitCache.split("#");
                 String name = splits[1];
-                if(p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
+                if(p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', name))) {
                     return true;
                 }
             }
