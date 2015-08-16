@@ -41,6 +41,7 @@ public class DataManager {
     private Map<UUID, String> bRoomPlayersRoom;
     private Map<String, Integer> bRoomWinCount;
     private BRoomIdle bRoomIdle;
+    private Map<UUID, String> quitBRoom;
 
     private Bosses[] bosses;
 
@@ -79,6 +80,7 @@ public class DataManager {
         bRoomWinCount = plugin.getbRoomWinCount();
         worldGuard = plugin.getWorldGuard();
         bosses = plugin.getBosses();
+        quitBRoom = plugin.getQuitBRoom();
 
         storageConfig = plugin.getStorageConfig();
         cratesConfig = plugin.getCratesConfig();
@@ -248,6 +250,26 @@ public class DataManager {
             }
         }
         return temp;
+    }
+
+    public void setQuitBRoom(Player p, String bRoom){
+        quitBRoom.put(p.getUniqueId(), bRoom);
+        storageConfig.set("players."+p.getUniqueId()+".quitRoom", bRoom);
+        storageConfig.saveConfig();
+    }
+
+    public void removeQuitBRoom(Player p){
+        quitBRoom.remove(p.getUniqueId());
+        storageConfig.set("players." + p.getUniqueId() + ".quitRoom", null);
+        storageConfig.saveConfig();
+    }
+
+    public Boolean containsQuitBRoom(Player p){
+        return quitBRoom.containsKey(p.getUniqueId());
+    }
+
+    public String getQuitBRoom(Player p){
+        return quitBRoom.get(p.getUniqueId());
     }
 
 }

@@ -116,9 +116,11 @@ public class BRoom {
         dataManager.getbRoomIdle().removePlayer(p);
         players.remove(p.getUniqueId());
         currentPlayers--;
-        dataManager.removePlayerRole(p.getUniqueId());
+        dataManager.removePlayersRoom(p.getUniqueId());
         if(dataManager.getBRoomPlayersRole(p.getUniqueId())){
             stop();
+        }else{
+            dataManager.removePlayerRole(p.getUniqueId());
         }
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
     }
@@ -346,7 +348,7 @@ public class BRoom {
         public void run() {
             if(!bRoom.getStop()){
                 if (timer == 0) {
-                    for (UUID player : players) {
+                    for (UUID player : bRoom.getPlayers()) {
                         Bukkit.getPlayer(player).teleport(spawn);
                         msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
                     }
@@ -360,7 +362,7 @@ public class BRoom {
                 }
 
                 if (countingNums.contains(timer)) {
-                    for (UUID player : players){
+                    for (UUID player : bRoom.getPlayers()){
                         msg.send(Bukkit.getPlayer(player), "d", message.replace("%t", timer + ""));
                     }
                 }

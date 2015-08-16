@@ -9,23 +9,23 @@ import org.bukkit.entity.Player;
  * Created by Mark on 2015-04-03.
  */
 public class Messenger {
-    Reality plugin;
-    ChatColor DARKRED = ChatColor.DARK_RED;
-    ChatColor RED = ChatColor.RED;
-    ChatColor YELLOW = ChatColor.YELLOW;
-    ChatColor DARKGREEN = ChatColor.DARK_GREEN;
-    ChatColor GREEN = ChatColor.GREEN;
-    ChatColor AQUA = ChatColor.AQUA;
-    ChatColor DARKAQUA = ChatColor.DARK_AQUA;
-    ChatColor BLUE = ChatColor.BLUE;
-    ChatColor DARKBLUE = ChatColor.DARK_BLUE;
-    ChatColor PURPLE = ChatColor.LIGHT_PURPLE;
-    ChatColor DARKPURPLE = ChatColor.DARK_PURPLE;
-    ChatColor WHITE = ChatColor.WHITE;
-    ChatColor GREY = ChatColor.GRAY;
-    ChatColor BLACK = ChatColor.BLACK;
-    ChatColor color;
-    String prefix = "";
+    private Reality plugin;
+    private ChatColor DARKRED = ChatColor.DARK_RED;
+    private ChatColor RED = ChatColor.RED;
+    private ChatColor YELLOW = ChatColor.YELLOW;
+    private ChatColor DARKGREEN = ChatColor.DARK_GREEN;
+    private ChatColor GREEN = ChatColor.GREEN;
+    private ChatColor AQUA = ChatColor.AQUA;
+    private ChatColor DARKAQUA = ChatColor.DARK_AQUA;
+    private ChatColor BLUE = ChatColor.BLUE;
+    private ChatColor DARKBLUE = ChatColor.DARK_BLUE;
+    private ChatColor PURPLE = ChatColor.LIGHT_PURPLE;
+    private ChatColor DARKPURPLE = ChatColor.DARK_PURPLE;
+    private ChatColor WHITE = ChatColor.WHITE;
+    private ChatColor GREY = ChatColor.GRAY;
+    private ChatColor BLACK = ChatColor.BLACK;
+    private ChatColor color;
+    private String prefix = "";
 
     public Messenger(Reality plugin)
     {
@@ -43,6 +43,16 @@ public class Messenger {
             color(c);
             p.sendMessage(prefix + " " + this.color.toString() + msg);
         }
+    }
+
+    public void important(Player p, String msg){
+        p.sendMessage("");
+        p.sendMessage("");
+        send(p, "4", ChatColor.STRIKETHROUGH + "-------------------[" + ChatColor.RESET.toString() + ChatColor.RED + ChatColor.BOLD.toString() + "IMPORTANT" + ChatColor.DARK_RED.toString() + ChatColor.STRIKETHROUGH + "]--------------------");
+        p.sendMessage("");
+        send(p, "e", msg);
+        p.sendMessage("");
+        send(p, "4", ChatColor.STRIKETHROUGH + "--------------------------------------------------");
     }
 
     public void broadcast(String msg){

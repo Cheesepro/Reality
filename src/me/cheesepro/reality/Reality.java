@@ -16,10 +16,7 @@ import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.ConfigManager;
 import me.cheesepro.reality.utils.Logger;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -180,6 +177,12 @@ public class Reality extends JavaPlugin implements Listener{
      */
     private BRoomIdle bRoomIdle = new BRoomIdle(this);
 
+    /*
+     * Stores the login location for players who exit minecraft while in a boss room.
+     * Format <Player, the room that the player quit>
+     */
+    private Map<UUID, String> quitBRoom = new HashMap<UUID, String>();
+
     private Logger logger = new Logger();
 
     private ConfigManager configManager;
@@ -210,8 +213,6 @@ public class Reality extends JavaPlugin implements Listener{
             setupEconomy();
             registerCommands();
             registerListeners();
-//            BossesSetup bossesSetup = new BossesSetup();
-            //TODO enable bossesSetup after finished
             if(getWorldEdit()==null){
                 logger.warn("WorldEdit dependency not found!");
             }
@@ -262,7 +263,7 @@ public class Reality extends JavaPlugin implements Listener{
         new BRoomBossesDieListener(this);
         new BRoomCommandsListener(this);
         new PlayerDeathListener(this);
-        new PlayerQuitListener();
+        new PlayerQuitListener(this);
         new BRoomUpdateListener();
         new BRoomShopInvListener(this);
         new BRoomIdleListeners(this);
@@ -424,6 +425,9 @@ public class Reality extends JavaPlugin implements Listener{
                     }
                     if(storageConfig.getString("players."+uuid+".level")!=null){
                         cache.put("level", storageConfig.getString("players."+uuid+".level"));
+                    }
+                    if(storageConfig.getString("players."+uuid+".quitRoom")!=null){
+                        quitBRoom.put(UUID.fromString(uuid), storageConfig.getString("players."+uuid+".quitRoom"));
                     }
                     playersINFO.put(UUID.fromString(uuid), cache);
                 }
@@ -734,5 +738,9 @@ public class Reality extends JavaPlugin implements Listener{
 
     public BRoomIdle getbRoomIdle(){
         return bRoomIdle;
+    }
+
+    public Map<UUID, String> getQuitBRoom(){
+        return quitBRoom;
     }
 }
