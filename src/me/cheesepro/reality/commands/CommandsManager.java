@@ -69,11 +69,6 @@ public class CommandsManager implements CommandExecutor{
                     }
                 }else if(args.length>=3){
                     if(args[0].equalsIgnoreCase("bossroom")){
-                        if(pManager.hasDefaultPermission(p)){
-                            if(args[1].equalsIgnoreCase("buy")){
-                                bossesCommands.commandBuy(p, args[2]);
-                            }
-                        }
                         if(pManager.hasAdminPermission(p)){
                             if(args[1].equalsIgnoreCase("create")){
                                 bossesCommands.commandCreate(p, args[2]);
@@ -88,6 +83,11 @@ public class CommandsManager implements CommandExecutor{
                                 bossesCommands.commandEnable(p, args[2]);
                             }else if(args[1].equalsIgnoreCase("remove") || args[1].equalsIgnoreCase("delete")){
                                 bossesCommands.commandRemove(p, args[2]);
+                            }
+                        }
+                        if(pManager.hasDefaultPermission(p)){
+                            if(args[1].equalsIgnoreCase("buy")){
+                                bossesCommands.commandBuy(p, args[2]);
                             }
                         }else{
                             msg.noPermission(p);

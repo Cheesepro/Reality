@@ -115,9 +115,15 @@ public class BossesPathFinding {
 
     public void stopPathFinding(NPC npc){
         bossNPCs.remove(npc);
-        bossXLoc.remove(npc.getUniqueId());
-        bossZLoc.remove(npc.getUniqueId());
-        bossStillCount.remove(npc.getUniqueId());
+        if(bossXLoc!=null && !bossXLoc.toString().equalsIgnoreCase("{}") && bossXLoc.containsKey(npc.getUniqueId())){
+            bossXLoc.remove(npc.getUniqueId());
+        }
+        if(bossZLoc!=null && !bossZLoc.toString().equalsIgnoreCase("{}") && bossZLoc.containsKey(npc.getUniqueId())){
+            bossZLoc.remove(npc.getUniqueId());
+        }
+        if(bossStillCount!=null && !bossStillCount.toString().equalsIgnoreCase("{}") && bossStillCount.containsKey(npc.getUniqueId())){
+            bossStillCount.remove(npc.getUniqueId());
+        }
     }
 
 
