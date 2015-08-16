@@ -4,6 +4,7 @@ import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.Messenger;
 import me.cheesepro.reality.utils.Tools;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -13,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -77,7 +77,9 @@ public class AbilityCobweb implements Abilities, Listener{
                         for (Entity e : p.getNearbyEntities(10, 10, 10)) {
                             if (e instanceof Player) {
                                 Player closestP = (Player) e;
-                                Block block = closestP.getWorld().getBlockAt(closestP.getLocation());
+                                Location loc = closestP.getLocation();
+                                loc.setY(loc.getY()+1);
+                                Block block = closestP.getWorld().getBlockAt(loc);
                                 block.setType(Material.WEB);
                                 anyone = true;
                             }
