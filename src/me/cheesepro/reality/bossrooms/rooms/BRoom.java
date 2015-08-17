@@ -372,8 +372,6 @@ public class BRoom {
                     bRoom.setBossNPC(boss.getNPC());
                     boss.spawn(bRoom.getBossLocation());
                     bossesPathFinding.startPathFinding(bRoom.getBossNPC(), bRoom.getBRoomName());
-                    //TODO FIX BOSS SPAWN TWICE WHEN TWO BOSS ROOM HAVE THE SAME BOSS
-                    //TODO Fix player do no damage to boss due to worldguard flags
                     bRoom.state = BRoomState.STARTED;
                     Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
                     cancel();
