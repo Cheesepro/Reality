@@ -80,15 +80,18 @@ public class AbilityCobweb implements Abilities, Listener{
                                 Location loc = closestP.getLocation();
                                 loc.setY(loc.getY()+1);
                                 Block block = closestP.getWorld().getBlockAt(loc);
-                                block.setType(Material.WEB);
-                                anyone = true;
+                                if(block.getType()==Material.AIR){
+                                    block.setType(Material.WEB);
+                                    anyone = true;
+                                    msg.send(closestP, "6", "Some one got you with their ability!");
+                                }
                             }
                         }
 
                         if(anyone){
                             msg.send(p, "2", "Got someone!");
                         }else{
-                            msg.send(p, "5", "No one is around you within 10 blocks");
+                            msg.send(p, "5", "Cobweb cannot be placed with in 10 blocks of radius.");
                         }
 
                         cooldownTime.put(p, Integer.parseInt(abilitiesOptions.get("COBWEB").get("cooldown")));
