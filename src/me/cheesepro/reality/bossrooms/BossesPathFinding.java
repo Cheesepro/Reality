@@ -8,6 +8,7 @@ import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.EffectsAPI;
 import me.cheesepro.reality.utils.Messenger;
+import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,7 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Mark on 2015-08-12.
@@ -24,7 +28,8 @@ import java.util.*;
 public class BossesPathFinding {
 
     private Reality plugin;
-    private static List<NPC> bossNPCs = new ArrayList<NPC>();
+    private static Map<UUID, String> bossNPCsINFO = new HashMap<UUID, String>();
+//    private static List<NPC> bossNPCs = new ArrayList<NPC>();
     private static boolean isPathFindingTaskRunning;
     private Messenger msg;
     private WorldGuardPlugin worldGuard;
@@ -42,87 +47,100 @@ public class BossesPathFinding {
         effectsAPI = new EffectsAPI(plugin);
     }
 
-    public void startPathFinding(final NPC npc, final String bRoomName){
-        bossNPCs.add(npc);
-        if(!isPathFindingTaskRunning){
-            new BukkitRunnable()
-            {
-                @Override
-                public void run()
+    public void startPathFinding(NPC npc, String bRoomName){
+        if(npc!=null){
+            bossNPCsINFO.put(npc.getUniqueId(), bRoomName);
+            if(!isPathFindingTaskRunning){
+                new BukkitRunnable()
                 {
-                    isPathFindingTaskRunning=true;
-                    if(bossNPCs.isEmpty() || bossNPCs.toString().equalsIgnoreCase("{}"))
+                    @Override
+                    public void run()
                     {
-                        isPathFindingTaskRunning=false;
-                        cancel();
-                    }else{
-                        for(NPC npc1 : bossNPCs){
-                            ProtectedRegion rg = worldGuard.getRegionManager(Bukkit.getWorld(dataManager.getBossesWorld())).getRegion("reality_bossroom_" + bRoomName);
-                            if(rg!=null){
-                                Region region = new CuboidRegion(rg.getMaximumPoint(), rg.getMinimumPoint());
-                                Location centerLoc = new Location(Bukkit.getWorld(dataManager.getBossesWorld()), region.getCenter().getX(), region.getCenter().getY(),region.getCenter().getZ());
-                                Collection<Entity> entities = Bukkit.getWorld(dataManager.getBossesWorld()).getNearbyEntities(centerLoc, region.getWidth() / 2, region.getHeight() / 2, region.getLength() / 2);
-                                double minDistance = -1;
-                                Entity target = null;
-                                for(Entity entity : entities){
-                                    if(entity!=null){
-                                        if(entity instanceof Player){
-                                            if(target==null){
-                                                minDistance = npc.getEntity().getLocation().distance(entity.getLocation());
-                                                target = entity;
-                                            }else{
-                                                if(npc.getEntity().getLocation().distance(entity.getLocation())<minDistance){
-                                                    minDistance = npc.getEntity().getLocation().distance(entity.getLocation());
-                                                    target = entity;
+                        isPathFindingTaskRunning=true;
+                        if(bossNPCsINFO.isEmpty() || bossNPCsINFO.toString().equalsIgnoreCase("{}"))
+                        {
+                            isPathFindingTaskRunning=false;
+                            cancel();
+                        }else{
+                            for(UUID npcID : bossNPCsINFO.keySet()){
+                                NPC npc1 = CitizensAPI.getNPCRegistry().getByUniqueId(npcID);
+                                if(npc1!=null){
+                                    ProtectedRegion rg = worldGuard.getRegionManager(Bukkit.getWorld(dataManager.getBossesWorld())).getRegion("reality_bossroom_" + bossNPCsINFO.get(npcID));
+                                    if(rg!=null){
+                                        Region region = new CuboidRegion(rg.getMaximumPoint(), rg.getMinimumPoint());
+                                        Location centerLoc = new Location(Bukkit.getWorld(dataManager.getBossesWorld()), region.getCenter().getX(), region.getCenter().getY(),region.getCenter().getZ());
+                                        Collection<Entity> entities = Bukkit.getWorld(dataManager.getBossesWorld()).getNearbyEntities(centerLoc, region.getWidth() / 2, region.getHeight() / 2, region.getLength() / 2);
+                                        double minDistance = -1;
+                                        Entity target = null;
+                                        for(Entity entity : entities){
+                                            if(entity!=null){
+                                                if(entity instanceof Player){
+                                                    if(target==null){
+                                                        minDistance = npc1.getEntity().getLocation().distance(entity.getLocation());
+                                                        target = entity;
+                                                    }else{
+                                                        if(npc1.getEntity().getLocation().distance(entity.getLocation())<minDistance){
+                                                            minDistance = npc1.getEntity().getLocation().distance(entity.getLocation());
+                                                            target = entity;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                }
-                                if(npc1.isSpawned()){
-                                    npc1.getNavigator().setTarget(target, true);
-                                }
-                                if(bossXLoc.containsKey(npc1.getUniqueId()) && bossZLoc.containsKey(npc1.getUniqueId())){
-                                    if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
-                                        if(bossStillCount.containsKey(npc1.getUniqueId())){
-                                            if(bossStillCount.get(npc1.getUniqueId())>=0.5*4){
-                                                effectsAPI.effect(npc.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
-                                                npc.teleport(centerLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                                                bossStillCount.put(npc1.getUniqueId(), 0.5);
-                                            }else{
-                                                bossStillCount.put(npc1.getUniqueId(), bossStillCount.get(npc1.getUniqueId())+0.5);
+                                        if(target!=null){
+                                            if(npc1.isSpawned()){
+                                                npc1.getNavigator().setTarget(target, true);
                                             }
-                                        }else{
-                                            bossStillCount.put(npc1.getUniqueId(), 0.5);
                                         }
-                                    }else{
-                                        bossStillCount.put(npc1.getUniqueId(), 0.5);
-                                        bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
-                                        bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
+                                        if(npc1.isSpawned() && npc1.getEntity().isValid() && npc1!=null){
+                                            if(bossXLoc.containsKey(npc1.getUniqueId()) && bossZLoc.containsKey(npc1.getUniqueId())){
+                                                if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
+                                                    if(bossStillCount.containsKey(npc1.getUniqueId())){
+                                                        if(bossStillCount.get(npc1.getUniqueId())>=0.5*6){
+                                                            effectsAPI.effect(npc1.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
+                                                            npc1.teleport(centerLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                                                            bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                        }else{
+                                                            bossStillCount.put(npc1.getUniqueId(), bossStillCount.get(npc1.getUniqueId())+0.5);
+                                                        }
+                                                    }else{
+                                                        bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                    }
+                                                }else{
+                                                    bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                    bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
+                                                    bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
+                                                }
+                                            }else{
+                                                bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
+                                                bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
+                                            }
+                                        }
                                     }
-                                }else{
-                                    bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
-                                    bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
                                 }
                             }
                         }
                     }
-                }
-            }.runTaskTimer(plugin, 0, 10);
-            //10 ticks = 0.5 sec;
+                }.runTaskTimer(plugin, 0, 20);
+                //10 ticks = 0.5 sec;
+            }
         }
     }
 
     public void stopPathFinding(NPC npc){
-        bossNPCs.remove(npc);
-        if(bossXLoc!=null && !bossXLoc.toString().equalsIgnoreCase("{}") && bossXLoc.containsKey(npc.getUniqueId())){
-            bossXLoc.remove(npc.getUniqueId());
-        }
-        if(bossZLoc!=null && !bossZLoc.toString().equalsIgnoreCase("{}") && bossZLoc.containsKey(npc.getUniqueId())){
-            bossZLoc.remove(npc.getUniqueId());
-        }
-        if(bossStillCount!=null && !bossStillCount.toString().equalsIgnoreCase("{}") && bossStillCount.containsKey(npc.getUniqueId())){
-            bossStillCount.remove(npc.getUniqueId());
+        if(npc!=null){
+            if(bossNPCsINFO!=null && !bossNPCsINFO.toString().equalsIgnoreCase("{}") && bossNPCsINFO.containsKey(npc.getUniqueId())){
+                bossNPCsINFO.remove(npc.getUniqueId());
+            }
+            if(bossXLoc!=null && !bossXLoc.toString().equalsIgnoreCase("{}") && bossXLoc.containsKey(npc.getUniqueId())){
+                bossXLoc.remove(npc.getUniqueId());
+            }
+            if(bossZLoc!=null && !bossZLoc.toString().equalsIgnoreCase("{}") && bossZLoc.containsKey(npc.getUniqueId())){
+                bossZLoc.remove(npc.getUniqueId());
+            }
+            if(bossStillCount!=null && !bossStillCount.toString().equalsIgnoreCase("{}") && bossStillCount.containsKey(npc.getUniqueId())){
+                bossStillCount.remove(npc.getUniqueId());
+            }
         }
     }
 

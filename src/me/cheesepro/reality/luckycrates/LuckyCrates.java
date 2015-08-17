@@ -147,7 +147,6 @@ public class LuckyCrates implements Listener {
 
     @EventHandler
     public void KeyClonePreventer(InventoryClickEvent e) {
-        //TODO prevent player from right click drag.
         Player p = (Player) e.getWhoClicked();
         if(p.getGameMode() == GameMode.CREATIVE){
             if (e.getCursor().getType() == crateKey.getType() && e.getCursor().getItemMeta().getDisplayName().equalsIgnoreCase(crateKey.getItemMeta().getDisplayName())) {

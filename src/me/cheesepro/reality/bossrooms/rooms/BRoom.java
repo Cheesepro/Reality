@@ -5,6 +5,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.BossesPathFinding;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
@@ -127,6 +128,7 @@ public class BRoom {
 
     public void removePlayer(Player p){
         if(dataManager.getBRoomPlayersRole(p.getUniqueId())){
+            dataManager.getbRoomIdle().removePlayer(p);
             stop();
         }else{
             p.teleport(end);
@@ -143,6 +145,7 @@ public class BRoom {
             currentPlayers--;
             dataManager.removePlayerRole(p.getUniqueId());
             dataManager.removePlayersRoom(p.getUniqueId());
+            dataManager.getbRoomIdle().removePlayer(p);
         }
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
 
@@ -326,6 +329,19 @@ public class BRoom {
         return stop;
     }
 
+    public void setBossNPC(NPC npc){
+        if(npc!=null){
+            bossNPC = npc;
+        }
+    }
+
+    public NPC getBossNPC(){
+        if(bossNPC!=null){
+            return bossNPC;
+        }
+        return null;
+    }
+
     private class Countdown extends BukkitRunnable {
 
         private int timer;
@@ -349,12 +365,14 @@ public class BRoom {
             if(!bRoom.getStop()){
                 if (timer == 0) {
                     for (UUID player : bRoom.getPlayers()) {
-                        Bukkit.getPlayer(player).teleport(spawn);
+                        Bukkit.getPlayer(player).teleport(bRoom.getSpawn());
                         msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
                     }
-                    bossNPC = bossesAPI.getBoss(getBossType()).getNPC();
-                    bossesAPI.getBoss(getBossType()).spawn(bossLocation);
-                    bossesPathFinding.startPathFinding(bossNPC, getBRoomName());
+                    Bosses boss = bossesAPI.getBoss(bRoom.getBossType());
+                    bRoom.setBossNPC(boss.getNPC());
+                    boss.spawn(bRoom.getBossLocation());
+                    bossesPathFinding.startPathFinding(bRoom.getBossNPC(), bRoom.getBRoomName());
+                    //TODO FIX BOSS SPAWN TWICE WHEN TWO BOSS ROOM HAVE THE SAME BOSS
                     //TODO Fix player do no damage to boss due to worldguard flags
                     bRoom.state = BRoomState.STARTED;
                     Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());

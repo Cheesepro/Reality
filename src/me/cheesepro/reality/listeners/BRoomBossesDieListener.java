@@ -52,13 +52,15 @@ public class BRoomBossesDieListener implements Listener {
     public void onBossDie(EntityDeathEvent e){
         for(BRoom bRoom : bRoomManager.getBRooms()) {
             if (isEntityBoss(e, bossesAPI.getBoss(bRoom.getBossType()).getName())) {
-                e.getDrops().clear();
-                e.setDroppedExp(0);
-                CitizensAPI.getNPCRegistry().getNPC(e.getEntity()).destroy();
-                dataManager.addBRoomWinCount(bRoom.getBRoomName(), 1);
-                bRoom.bossDie(e.getEntity());
-                for(UUID id : bRoom.getPlayers()){
-                    msg.send(Bukkit.getPlayer(id), "a", "Boss " + bRoom.getBossType() + " got beaten " + dataManager.getBRoomWinCount(bRoom.getBRoomName()) + " times!");
+                if(bRoom.getState()==BRoom.BRoomState.STARTED){
+                    e.getDrops().clear();
+                    e.setDroppedExp(0);
+                    CitizensAPI.getNPCRegistry().getNPC(e.getEntity()).destroy();
+                    dataManager.addBRoomWinCount(bRoom.getBRoomName(), 1);
+                    bRoom.bossDie(e.getEntity());
+                    for(UUID id : bRoom.getPlayers()){
+                        msg.send(Bukkit.getPlayer(id), "a", "Boss " + bRoom.getBossType() + " got beaten " + dataManager.getBRoomWinCount(bRoom.getBRoomName()) + " times!");
+                    }
                 }
             }
         }

@@ -29,6 +29,7 @@ public class BRoomShopInvListener implements Listener{
         if (e.getCurrentItem() == null) return;
         if (e.getCurrentItem().getItemMeta() == null) return;
         if (e.getClick() == ClickType.UNKNOWN) return;
+        if (!e.getCurrentItem().getItemMeta().hasDisplayName()) return;
         if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.YELLOW.toString() + ChatColor.STRIKETHROUGH + "---------" + ChatColor.YELLOW + "[" + ChatColor.BLUE + "INFO" + ChatColor.YELLOW.toString() + "]" + ChatColor.STRIKETHROUGH + "---------")) {
             e.setCancelled(true);
             Player p = (Player) e.getWhoClicked();

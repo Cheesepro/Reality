@@ -47,32 +47,4 @@ public class BRoomIdleListeners implements Listener{
         }
     }
 
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent e)
-    {
-        if(dataManager.getInGamePlayersList().contains(e.getPlayer().getUniqueId())){
-            bRoomIdle.setIdle(e.getPlayer(), bRoomManager.getBRoom(e.getPlayer()).getIdleTimeout());
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e)
-    {
-        if (!e.isCancelled()) {
-            if(dataManager.getInGamePlayersList().contains(e.getPlayer().getUniqueId())){
-                bRoomIdle.setIdle(e.getPlayer(), bRoomManager.getBRoom(e.getPlayer()).getIdleTimeout());
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent e)
-    {
-        if (!e.isCancelled()) {
-            if(dataManager.getInGamePlayersList().contains(e.getPlayer().getUniqueId())){
-                bRoomIdle.setIdle(e.getPlayer(), bRoomManager.getBRoom(e.getPlayer()).getIdleTimeout());
-            }
-        }
-    }
-
 }

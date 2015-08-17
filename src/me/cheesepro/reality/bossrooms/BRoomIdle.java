@@ -27,7 +27,7 @@ public class BRoomIdle {
         msg = new Messenger(plugin);
     }
 
-    public void addIdleCountDown(final UUID id){
+    public void addIdleCountDown(UUID id){
         setIdle(Bukkit.getPlayer(id), bRoomManager.getBRoom(Bukkit.getPlayer(id)).getIdleTimeout());
         if(!isIdleTaskRunning){
             new BukkitRunnable()
@@ -36,30 +36,29 @@ public class BRoomIdle {
                 public void run()
                 {
                     isIdleTaskRunning=true;
-                    System.out.print(idleCount);
                     if(idleCount.isEmpty() || idleCount.toString().equalsIgnoreCase("{}"))
                     {
                         isIdleTaskRunning=false;
                         cancel();
                     }
-                    if(idleCount.containsKey(id)){
-                        if(bRoomManager.getBRoom(Bukkit.getPlayer(id))!=null){
-                            if(idleCount.get(id)==1){
-                                bRoomManager.getBRoom(Bukkit.getPlayer(id)).removePlayer(Bukkit.getPlayer(id));
-                                msg.send(Bukkit.getPlayer(id), "4", "You are kicked from the game for idling too long!");
+                    for(UUID uuid : idleCount.keySet()) {
+                        if (bRoomManager.getBRoom(Bukkit.getPlayer(uuid)) != null) {
+                            if (idleCount.get(uuid) == 1) {
+                                bRoomManager.getBRoom(Bukkit.getPlayer(uuid)).removePlayer(Bukkit.getPlayer(uuid));
+                                msg.send(Bukkit.getPlayer(uuid), "4", "You are kicked from the game for idling too long!");
                             }
-                        }else{
-                            idleCount.remove(id);
-                        }
-                    }
-                    for(UUID uuid : idleCount.keySet()){
-                        idleCount.put(uuid, idleCount.get(uuid)-1);
-                        if(idleCount.get(uuid)<=10){
-                            msg.send(Bukkit.getPlayer(id), "4", "You will be kicked from the room for idling too long in "+idleCount.get(uuid)+" second(s)!");
+                            if(idleCount.containsKey(uuid)){
+                                idleCount.put(uuid, idleCount.get(uuid) - 1);
+                                if (idleCount.get(uuid) <= 10) {
+                                    msg.send(Bukkit.getPlayer(uuid), "4", "You will be kicked from the room for idling too long in " + idleCount.get(uuid) + " second(s)!");
+                                }
+                            }
+                        } else {
+                            idleCount.remove(uuid);
                         }
                     }
                 }
-            }.runTaskTimer(plugin, 20, 20);
+            }.runTaskTimer(plugin, 0, 20);
             //20 ticks = 1 sec;
         }
     }
@@ -69,7 +68,9 @@ public class BRoomIdle {
     }
 
     public void removePlayer(Player p){
-        idleCount.remove(p.getUniqueId());
+        if(idleCount.containsKey(p.getUniqueId())){
+            idleCount.remove(p.getUniqueId());
+        }
     }
 
 }

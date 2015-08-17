@@ -9,10 +9,10 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.listeners.BRoomUpdateListener;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
+import me.cheesepro.reality.listeners.BRoomUpdateListener;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
@@ -43,6 +43,8 @@ public class BossesCommands {
     private WorldEditPlugin worldEdit;
     private WorldGuardPlugin worldGuard;
 
+    private BRoomUpdateListener bRoomUpdateListener;
+
     public BossesCommands(Reality plugin){
         this.plugin = plugin;
         msg = new Messenger(plugin);
@@ -54,9 +56,8 @@ public class BossesCommands {
         bossRoomsConfig = plugin.getBossRoomsConfig();
         bRoomManager = new BRoomManager(plugin);
         bossesAPI = new BossesAPI(plugin);
+        bRoomUpdateListener = new BRoomUpdateListener();
     }
-
-    //TODO CREATE a boss room information change eventhandlers and place the activator in the BRoom.java and trigger the event to update the inventory above
 
     public void commandSet(Player p, String bRoom, String option){
         if(dataManager.isBRoomValid(bRoom)) {
@@ -184,48 +185,51 @@ public class BossesCommands {
         }
     }
 
-    public void commandCreate(Player p, String bRoom){
-        if(bossesWorld.equalsIgnoreCase(p.getWorld().getName())){
-            Selection selection = worldEdit.getSelection(p);
-            if(selection!=null){
-                ProtectedCuboidRegion region = new ProtectedCuboidRegion(
-                        "reality_bossroom_" + bRoom,
-                        new BlockVector(selection.getNativeMinimumPoint()),
-                        new BlockVector(selection.getNativeMaximumPoint())
-                );
-                DefaultDomain owners = new DefaultDomain();
-                owners.addPlayer(worldGuard.wrapPlayer(p));
-                region.setOwners(owners);
-                region.setFlag(DefaultFlag.BLOCK_BREAK, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.BLOCK_PLACE, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.ENDERPEARL, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.GAME_MODE, GameMode.SURVIVAL);
-                region.setFlag(DefaultFlag.PVP, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.TNT, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.ENTITY_PAINTING_DESTROY, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.SLEEP, StateFlag.State.DENY);
-                region.setFlag(DefaultFlag.USE, StateFlag.State.ALLOW);
-                worldGuard.getRegionManager(p.getWorld()).addRegion(region);
+    public void commandCreate(Player p, String bRoom) {
+        if (!worldGuard.getRegionManager(Bukkit.getWorld(bossesWorld)).hasRegion("reality_bossroom_" + bRoom)) {
+            if (bossesWorld.equalsIgnoreCase(p.getWorld().getName())) {
+                Selection selection = worldEdit.getSelection(p);
+                if (selection != null) {
+                    ProtectedCuboidRegion region = new ProtectedCuboidRegion(
+                            "reality_bossroom_" + bRoom,
+                            new BlockVector(selection.getNativeMinimumPoint()),
+                            new BlockVector(selection.getNativeMaximumPoint())
+                    );
+                    DefaultDomain owners = new DefaultDomain();
+                    owners.addPlayer(worldGuard.wrapPlayer(p));
+                    region.setOwners(owners);
+                    region.setFlag(DefaultFlag.BLOCK_BREAK, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.BLOCK_PLACE, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.ENDERPEARL, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.GAME_MODE, GameMode.SURVIVAL);
+                    region.setFlag(DefaultFlag.PVP, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.TNT, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.ENTITY_PAINTING_DESTROY, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.SLEEP, StateFlag.State.DENY);
+                    region.setFlag(DefaultFlag.USE, StateFlag.State.ALLOW);
+                    worldGuard.getRegionManager(p.getWorld()).addRegion(region);
 
-                msg.send(p, "a", "Boss Room " + bRoom + " creation success");
-                msg.send(p, "e", "In order to make the boss room functional, you need to do the following setup commands:");
-                msg.send(p, "d", "/reality bossroom <name> set boss <BossName>");
-                msg.send(p, "d", "/reality bossroom <name> set lobby");
-                msg.send(p, "d", "/reality bossroom <name> set end");
-                msg.send(p, "d", "/reality bossroom <name> set spawn");
-                msg.send(p, "d", "/reality bossroom <name> set spectate");
-                msg.send(p, "d", "/reality bossroom <name> set bosslocation");
-                msg.send(p, "d", "/reality bossroom <name> set maxplayers <amount>");
-                msg.send(p, "d", "/reality bossroom <name> set minplayers <amount>");
-                msg.send(p, "d", "/reality bossroom <name> set idletimeout <amount>");
-
-            }else{
-                msg.send(p, "e", "Please make a worldedit selection of the boss room first!");
+                    msg.send(p, "a", "Boss Room " + bRoom + " creation success");
+                    msg.send(p, "e", "In order to make the boss room functional, you need to do the following setup commands:");
+                    msg.send(p, "d", "/reality bossroom <name> set boss <BossName>");
+                    msg.send(p, "d", "/reality bossroom <name> set lobby");
+                    msg.send(p, "d", "/reality bossroom <name> set end");
+                    msg.send(p, "d", "/reality bossroom <name> set spawn");
+                    msg.send(p, "d", "/reality bossroom <name> set spectate");
+                    msg.send(p, "d", "/reality bossroom <name> set bosslocation");
+                    msg.send(p, "d", "/reality bossroom <name> set maxplayers <amount>");
+                    msg.send(p, "d", "/reality bossroom <name> set minplayers <amount>");
+                    msg.send(p, "d", "/reality bossroom <name> set idletimeout <amount>");
+                } else {
+                    msg.send(p, "e", "Please make a worldedit selection of the boss room first!");
+                }
+            } else {
+                msg.send(p, "4", "You must be in world [" + bossesWorld + "] in order to create a boss room!");
             }
-        }else{
-            msg.send(p, "4", "You must be in world ["+bossesWorld+"] in order to create a boss room!");
+        } else {
+            msg.send(p, "c", "Boss room " + bRoom + " already exist!");
         }
     }
 
@@ -325,7 +329,7 @@ public class BossesCommands {
 
     public void commandBuy(Player p, String bRoom){
         if(bRoom.equalsIgnoreCase("menu")){
-            p.openInventory(new BRoomUpdateListener().getInv());
+            p.openInventory(bRoomUpdateListener.getInv());
         }else{
             if(dataManager.isBRoomValid(bRoom)){
                 BRoom room = bRoomManager.getBRoom(bRoom);
@@ -358,18 +362,4 @@ public class BossesCommands {
             }
         }
     }
-
-//    public void commandJoin(Player p, String bRoom){
-//        if(bRoomManager.getBRoom(p)==null){
-//
-//        }else{
-//            msg.send(p, "c", "You are already in a Boss Room!");
-//        }
-//    }
-//
-//    public void commandQuit(Player p, String bRoom){
-//
-//    }
-
-
 }
