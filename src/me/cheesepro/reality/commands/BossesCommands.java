@@ -12,6 +12,7 @@ import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.rooms.BRoom;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
+import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.listeners.BRoomUpdateListener;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.DataManager;
@@ -67,10 +68,14 @@ public class BossesCommands {
             Double z = loc.getZ();
             Double pitch = Double.parseDouble(String.valueOf(loc.getPitch()));
             Double yaw = Double.parseDouble(String.valueOf(loc.getYaw()));
-            Map<String, Map<String, Double>> locations = new HashMap<String, Map<String, Double>>();
+            Map<String, Map<String, Double>> locations;
+            if(dataManager.getBRoomsLocations(bRoom)!=null){
+                locations = dataManager.getBRoomsLocations(bRoom);
+            }else{
+                locations = new HashMap<String, Map<String, Double>>();
+            }
             Map<String, Double> tempLoc = new HashMap<String, Double>();
             if(option.equalsIgnoreCase("lobby")){
-                tempLoc.clear();
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.x", x);
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.y", y);
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.lobby.z", z);
@@ -84,7 +89,6 @@ public class BossesCommands {
                 locations.put("lobby", tempLoc);
                 msg.send(p, "a", "Lobby location set for room " +bRoom);
             }else if(option.equalsIgnoreCase("end")){
-                tempLoc.clear();
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.end.x", x);
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.end.y", y);
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.end.z", z);
@@ -98,7 +102,6 @@ public class BossesCommands {
                 locations.put("end", tempLoc);
                 msg.send(p, "a", "End location set for room " + bRoom);
             }else if(option.equalsIgnoreCase("spawn")){
-                tempLoc.clear();
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.spawn.x", x);
                 bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.y", y);
                 bossRoomsConfig.set("rooms."+bRoom+".locations.spawn.z", z);
@@ -112,7 +115,6 @@ public class BossesCommands {
                 locations.put("spawn", tempLoc);
                 msg.send(p, "a", "Spawn location set for room " + bRoom);
             }else if(option.equalsIgnoreCase("spectate")){
-                tempLoc.clear();
                 bossRoomsConfig.set("rooms." + bRoom + ".locations.spectate.x", x);
                 bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.y", y);
                 bossRoomsConfig.set("rooms."+bRoom+".locations.spectate.z", z);
@@ -126,7 +128,6 @@ public class BossesCommands {
                 locations.put("spectate", tempLoc);
                 msg.send(p, "a", "Spectate location set for room " + bRoom);
             }else if(option.equalsIgnoreCase("bosslocation")){
-                tempLoc.clear();
                 bossRoomsConfig.set("rooms." + bRoom + ".boss.spawnlocation.x", x);
                 bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.y", y);
                 bossRoomsConfig.set("rooms."+bRoom+".boss.spawnlocation.z", z);
@@ -137,7 +138,7 @@ public class BossesCommands {
                 tempLoc.put("z", z);
                 tempLoc.put("pitch", pitch);
                 tempLoc.put("yaw", yaw);
-                locations.put("bosslocation", tempLoc);
+                dataManager.setbRoomsBossesLocations(bRoom, tempLoc);
                 msg.send(p, "a", "Boss spawn location set for room " + bRoom);
             }
             dataManager.setBRoomsLocations(bRoom, locations);
@@ -146,40 +147,50 @@ public class BossesCommands {
     }
 
     public void commandSet(Player p, String bRoom, String option, String value){
-        if(dataManager.isBRoomValid(bRoom)){
-                Map<String, String> settingsCache;
-                if(dataManager.isBRoomsSettingsValid(bRoom)){
-                    settingsCache = dataManager.getBRoomsSettings(bRoom);
-                }else{
-                    settingsCache = new HashMap<String, String>();
+        if(dataManager.isBRoomValid(bRoom)) {
+            Map<String, String> settingsCache;
+            if (dataManager.isBRoomsSettingsValid(bRoom)) {
+                settingsCache = dataManager.getBRoomsSettings(bRoom);
+            } else {
+                settingsCache = new HashMap<String, String>();
+            }
+            if (option.equalsIgnoreCase("boss")) {
+                if (dataManager.isBossValid(value)) {
+                    bossRoomsConfig.set("rooms." + bRoom + ".boss.type", value);
+                    bossRoomsConfig.saveConfig();
+                    dataManager.setBRoomsBosse(bRoom, value);
+                    msg.send(p, "a", "Boss type successfully set for room " + bRoom);
+                } else {
+                    msg.send(p, "5", "Boss " + value + " is not valid!");
                 }
-                if(option.equalsIgnoreCase("boss")){
-                    if(dataManager.isBossValid(value)){
-                        bossRoomsConfig.set("rooms."+bRoom+".boss.type", value);
-                        bossRoomsConfig.saveConfig();
-                        dataManager.setBRoomsBosse(bRoom, value);
-                        msg.send(p, "a", "Boss type successfully set for room " + bRoom);
-                    }else{
-                        msg.send(p, "5", "Boss " + value + " is not valid!");
-                    }
-                }else if(option.equalsIgnoreCase("idletimeout")){
-                    if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms." + bRoom + ".settings.idletimeout", Integer.parseInt(value));
-                    settingsCache.put("idletimeout", value);
-                    msg.send(p, "a", "Idle timeout set for room " + bRoom);
-                }else if(option.equalsIgnoreCase("maxplayers")){
-                    if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms." + bRoom + ".settings.maxplayers", Integer.parseInt(value));
-                    settingsCache.put("maxplayers", value);
-                    msg.send(p, "a", "Max players limit set for room " + bRoom);
-                }else if(option.equalsIgnoreCase("minplayers")){
-                    if(!tools.isInteger(value)){ msg.send(p, "5", "Input must be an integer!"); return;}
-                    bossRoomsConfig.set("rooms." + bRoom + ".settings.minplayers", Integer.parseInt(value));
-                    settingsCache.put("minplayers", value);
-                    msg.send(p, "a", "Min players limit set for room " + bRoom);
+            } else if (option.equalsIgnoreCase("idletimeout")) {
+                if (!tools.isInteger(value)) {
+                    msg.send(p, "5", "Input must be an integer!");
+                    return;
                 }
-                bossRoomsConfig.saveConfig();
-                dataManager.setBRoomsSettings(bRoom, settingsCache);
+                bossRoomsConfig.set("rooms." + bRoom + ".settings.idletimeout", Integer.parseInt(value));
+                settingsCache.put("idletimeout", value);
+                msg.send(p, "a", "Idle timeout set for room " + bRoom);
+            } else if (option.equalsIgnoreCase("maxplayers")) {
+                if (!tools.isInteger(value)) {
+                    msg.send(p, "5", "Input must be an integer!");
+                    return;
+                }
+                bossRoomsConfig.set("rooms." + bRoom + ".settings.maxplayers", Integer.parseInt(value));
+                settingsCache.put("maxplayers", value);
+                msg.send(p, "a", "Max players limit set for room " + bRoom);
+            } else if (option.equalsIgnoreCase("minplayers")) {
+                if (!tools.isInteger(value)) {
+                    msg.send(p, "5", "Input must be an integer!");
+                    return;
+                }
+                bossRoomsConfig.set("rooms." + bRoom + ".settings.minplayers", Integer.parseInt(value));
+                settingsCache.put("minplayers", value);
+                msg.send(p, "a", "Min players limit set for room " + bRoom);
+            }
+            bossRoomsConfig.saveConfig();
+            dataManager.setBRoomsSettings(bRoom, settingsCache);
+            System.out.print(dataManager.getBRoomsSettings(bRoom));
         }else{
             msg.send(p, "4", "Boss Room " + bRoom + " does not exist! Type /reality bossroom create " + bRoom + " to create it!");
         }
@@ -310,8 +321,9 @@ public class BossesCommands {
                     bossRoomsConfig.set("rooms." + bRoom + ".enabled", true);
                     bossRoomsConfig.saveConfig();
                     dataManager.setBRoomEnabled(bRoom, true);
+                    bRoomManager.addBRoom(bRoom);
                     msg.send(p, "a", "Room " + bRoom + " enabled!");
-                    //TODO fix locations enable error
+                    Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
                 }
             }else{
                 msg.send(p, "a", "Room " + bRoom + " is already enabled.");

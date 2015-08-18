@@ -175,6 +175,10 @@ public class DataManager {
         return bRoomsBossesLocations.get(key);
     }
 
+    public void setbRoomsBossesLocations(String key, Map<String, Double> map){
+        bRoomsBossesLocations.put(key, map);
+    }
+
     public Boolean isBRoomsBossesLocationsValid(String key){
         return bRoomsBossesLocations.containsKey(key);
     }

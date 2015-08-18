@@ -25,6 +25,10 @@ public class BRoomManager {
         }
     }
 
+    public void addBRoom(String key){
+        bRooms.add(new BRoom(key));
+    }
+
     public List<BRoom> getBRooms(){
         return bRooms;
     }
