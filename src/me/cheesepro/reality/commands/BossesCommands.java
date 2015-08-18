@@ -190,7 +190,10 @@ public class BossesCommands {
             }
             bossRoomsConfig.saveConfig();
             dataManager.setBRoomsSettings(bRoom, settingsCache);
-            System.out.print(dataManager.getBRoomsSettings(bRoom));
+            if(dataManager.isBRoomEnabled(bRoom)){
+                bRoomManager.reloadBRoom(bRoom);
+                Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
+            }
         }else{
             msg.send(p, "4", "Boss Room " + bRoom + " does not exist! Type /reality bossroom create " + bRoom + " to create it!");
         }
@@ -335,8 +338,9 @@ public class BossesCommands {
 
     public void commandRemove(Player p, String bRoom){
         dataManager.removeBRoom(bRoom);
-        worldGuard.getRegionManager(Bukkit.getWorld(bossesWorld)).removeRegion("reality_bossroom_"+bRoom);
+        worldGuard.getRegionManager(Bukkit.getWorld(bossesWorld)).removeRegion("reality_bossroom_" + bRoom);
         msg.send(p, "d", "Room " + bRoom + " removing action complete.");
+        Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
     }
 
     public void commandBuy(Player p, String bRoom){

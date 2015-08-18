@@ -29,6 +29,14 @@ public class BRoomManager {
         bRooms.add(new BRoom(key));
     }
 
+    public void reloadBRoom(String key){
+        for (String room : dataManager.getBRooms()){
+            if(key.equalsIgnoreCase(room)){
+                getBRoom(room).reloadInfo();
+            }
+        }
+    }
+
     public List<BRoom> getBRooms(){
         return bRooms;
     }

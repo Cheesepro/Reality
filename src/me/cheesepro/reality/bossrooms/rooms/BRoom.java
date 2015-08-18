@@ -84,6 +84,43 @@ public class BRoom {
         state = BRoomState.READY;
     }
 
+    public void reloadInfo(){
+        spawn = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spawn").get("x"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spawn").get("y"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spawn").get("z"),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("spawn").get("pitch"))),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("spawn").get("yaw"))));
+        lobby = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+                dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("x"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("y"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("z"),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("pitch"))),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("yaw"))));
+        end = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+                dataManager.getBRoomsLocations(getBRoomName()).get("end").get("x"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("end").get("y"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("end").get("z"),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("end").get("pitch"))),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("end").get("yaw"))));
+        spectate = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spectate").get("x"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spectate").get("y"),
+                dataManager.getBRoomsLocations(getBRoomName()).get("spectate").get("z"),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("spectate").get("pitch"))),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("spectate").get("yaw"))));
+        bossLocation = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+                dataManager.getBRoomsBossesLocations(getBRoomName()).get("x"),
+                dataManager.getBRoomsBossesLocations(getBRoomName()).get("y"),
+                dataManager.getBRoomsBossesLocations(getBRoomName()).get("z"),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsBossesLocations(getBRoomName()).get("pitch"))),
+                Float.parseFloat(String.valueOf(dataManager.getBRoomsBossesLocations(getBRoomName()).get("yaw"))));
+        maxPlayer = Integer.parseInt(dataManager.getBRoomsSettings(getBRoomName()).get("maxplayers"));
+        minPlayer = Integer.parseInt(dataManager.getBRoomsSettings(getBRoomName()).get("minplayers"));
+        idleTimeout = Integer.parseInt(dataManager.getBRoomsSettings(getBRoomName()).get("idletimeout"));
+        bossType = dataManager.getBRoomBoss(getBRoomName());
+    }
+
     public String getBRoomName(){
         return BRoomName;
     }
