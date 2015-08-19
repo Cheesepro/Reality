@@ -7,9 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Mark on 2015-08-10.
@@ -18,6 +16,7 @@ public class BRoomIdle {
     private Reality plugin;
     private BRoomManager bRoomManager;
     private static Map<UUID, Integer> idleCount = new HashMap<UUID, Integer>();
+    private static List<UUID> toBeRemoved = new ArrayList<UUID>();
     private static boolean isIdleTaskRunning;
     private Messenger msg;
 
@@ -54,8 +53,14 @@ public class BRoomIdle {
                                 }
                             }
                         } else {
-                            idleCount.remove(uuid);
+                            toBeRemoved.add(uuid);
                         }
+                    }
+                    if(!toBeRemoved.isEmpty() || !toBeRemoved.toString().equalsIgnoreCase("[]")){
+                        for(UUID remove : toBeRemoved){
+                            idleCount.remove(remove);
+                        }
+                        toBeRemoved.clear();
                     }
                 }
             }.runTaskTimer(plugin, 0, 20);

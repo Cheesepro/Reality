@@ -15,15 +15,15 @@ import java.util.UUID;
  */
 public class Tools {
 
-    Reality plugin;
-    Map<UUID, Map<String, String>> playersINFO;
-    Map<String, Map<String, List<String>>> ranks;
-    AbilitiesINFO abilitiesINFO;
-    Map<String, Map<String, Integer>> cratesLocations;
+    private Reality plugin;
+    private Map<UUID, Map<String, String>> playersINFO;
+    private AbilitiesINFO abilitiesINFO;
+    private Map<String, Map<String, Integer>> cratesLocations;
+    private DataManager dataManager;
 
     public Tools(Reality plugin){
         this.plugin = plugin;
-        ranks = plugin.getRanks();
+        dataManager = new DataManager(plugin);
         playersINFO = plugin.getPlayersINFO();
         abilitiesINFO = new AbilitiesINFO(plugin);
         cratesLocations = plugin.getCratesLocations();
@@ -63,11 +63,20 @@ public class Tools {
 
     public boolean isInteger(String in){
         try{
-            Integer.parseInt(in);
+            int test = Integer.parseInt(in);
         }catch (NumberFormatException e){
             return false;
         }
         return true;
+    }
+
+    public boolean canUseAbility(String rank, String ability){
+        if(dataManager.containsRanksAbilities(rank)){
+            if(dataManager.getRanksAbilities(rank).contains(ability)){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -77,8 +77,8 @@ public class BRoomCommandsListener implements Listener{
                 }
                 if(dataManager.getBRoomPlayersRole(id)){
                     if(bRoom.getState()==BRoom.BRoomState.LOBBY) {
-                        if (bRoom.getCurrentPlayers() <= bRoom.getMaxPlayer()) {
-                            if (Bukkit.getPlayer(args[1]).isOnline()) {
+                        if (bRoom.getCurrentPlayers() < bRoom.getMaxPlayer()) {
+                            if (Bukkit.getPlayer(args[1])!=null) {
                                 if (!invitedPlayer.containsKey(Bukkit.getPlayer(args[1]).getUniqueId())) {
                                     if(!dataManager.getInGamePlayersList().contains(Bukkit.getPlayer(args[1]).getUniqueId())){
                                         invitedPlayer.put(Bukkit.getPlayer(args[1]).getUniqueId(), p.getUniqueId());
@@ -92,7 +92,7 @@ public class BRoomCommandsListener implements Listener{
                                     msg.send(p, "d", args[1] + " is already invited by someone.");
                                 }
                             } else {
-                                msg.send(p, "d", "Sorry, player " + args[1] + " is not online!");
+                                msg.send(p, "d", "Sorry, player " + args[1] + " is not valid!");
                             }
                         } else {
                             msg.send(p, "d", "Sorry, the room has exceeded its maximum player(s) limit! Max players allowed: " + bRoom.getMaxPlayer());
@@ -150,7 +150,7 @@ public class BRoomCommandsListener implements Listener{
                         timeoutCount.put(uuid, timeoutCount.get(uuid)-1);
                     }
                 }
-            }.runTaskTimer(plugin, 0, 20);
+            }.runTaskTimerAsynchronously(plugin, 0, 20);
             //20 ticks = 1 sec;
         }
     }

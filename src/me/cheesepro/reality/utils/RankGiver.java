@@ -16,28 +16,28 @@ import java.util.*;
  */
 public class RankGiver {
 
-    Reality plugin;
-    Map<String, List<String>> settings;
-    Map<String, Map<String, List<String>>> ranks;
-    Map<String, String> messages;
-    Map<Integer, String> randomranks = new HashMap<Integer, String>();
-    List<String> allowranks = new ArrayList<String>();
-    Map<UUID, Map<String, String>> playersINFO;
-    Messenger msg;
-    AbilitiesINFO abilitiesINFO;
-    Config storageConfig;
-    Tools tools;
+    private Reality plugin;
+    private Map<String, List<String>> settings;
+    private Map<String, String> messages;
+    private Map<Integer, String> randomranks = new HashMap<Integer, String>();
+    private List<String> allowranks = new ArrayList<String>();
+    private Map<UUID, Map<String, String>> playersINFO;
+    private Messenger msg;
+    private AbilitiesINFO abilitiesINFO;
+    private Config storageConfig;
+    private Tools tools;
+    private DataManager dataManager;
 
     public RankGiver(Reality plugin){
         this.plugin = plugin;
         settings = plugin.getSettings();
-        ranks = plugin.getRanks();
         messages = plugin.getMessages();
         msg = new Messenger(plugin);
         abilitiesINFO = new AbilitiesINFO(plugin);
         playersINFO = plugin.getPlayersINFO();
         storageConfig = plugin.getStorageConfig();
         tools = new Tools(plugin);
+        dataManager = new DataManager(plugin);
     }
 
     public void giveRank(Player p){
@@ -64,15 +64,13 @@ public class RankGiver {
             cache.put("rank", rank);
             playersINFO.put(p.getUniqueId(), cache);
         }
-        Map<String, List<String>> mapCache = ranks.get(rank);
-        List<String> listCache;
-        if(mapCache.containsKey("health")){
-            listCache = mapCache.get("health");
-            p.setMaxHealth(Double.parseDouble(listCache.get(0)));
+//        Map<String, List<String>> mapCache = ranks.get(rank);
+//        List<String> listCache;
+        if(dataManager.containsRanksHealth(rank)){
+            p.setMaxHealth(dataManager.getRanksHealth(rank));
         }
-        if(mapCache.containsKey("starting-kit")){
-            listCache = mapCache.get("starting-kit");
-            for(String itemInfoCache : listCache){
+        if(dataManager.containsRanksKit(rank)){
+            for(String itemInfoCache : dataManager.getRanksKit(rank)){
                 String[] splits = itemInfoCache.split("#");
                 String itemCache = splits[0];
                 int itemAmountCache = Integer.parseInt(splits[1]);
@@ -87,7 +85,7 @@ public class RankGiver {
                 p.getInventory().addItem(item);
             }
         }
-        if(mapCache.containsKey("abilities")){
+        if(dataManager.containsRanksAbilities(rank)){
             List<String> items = abilitiesINFO.getRequiredItems(rank);
             List<String> names = abilitiesINFO.getNames(rank);
             List<String> descs = abilitiesINFO.getDescs(rank);

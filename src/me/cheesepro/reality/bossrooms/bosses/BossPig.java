@@ -87,8 +87,8 @@ public class BossPig implements Bosses {
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
-        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 2);
-        creature.addPotionEffect(potionEffect);
+        PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 20*1000, 2);
+        creature.addPotionEffect(speed);
         bossesAPI.basicSetup(creature, health);
     }
 

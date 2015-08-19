@@ -5,7 +5,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.BossesPathFinding;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -44,6 +42,7 @@ public class BRoom {
     private Boolean stop = false;
     private BossesPathFinding bossesPathFinding = new BossesPathFinding(plugin);
     private NPC bossNPC;
+    private BRoomManager bRoomManager = new BRoomManager(plugin);
 
     public BRoom(String name) {
         BRoomName = name;
@@ -129,6 +128,10 @@ public class BRoom {
         return state;
     }
 
+    public void setState(BRoomState input){
+        state = input;
+    }
+
     public void addPlayer(Player p){
         if(currentPlayers >= maxPlayer){
             msg.send(p, "c", "Sorry this room is already FULL!");
@@ -194,9 +197,7 @@ public class BRoom {
         this.state = BRoomState.COUNTING_DOWN;
         //TODO add Sign support
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
-
-        new Countdown(
-                false,
+        bRoomManager.addStartCountDown(
                 15,
                 "Boss Room " + getBRoomName() + " is starting in %t seconds!",
                 this,
@@ -207,7 +208,19 @@ public class BRoom {
                 3,
                 2,
                 1
-        ).runTaskTimer(Reality.getPlugin(), 0, 20);
+        );
+//        new Countdown(
+//                15,
+//                "Boss Room " + getBRoomName() + " is starting in %t seconds!",
+//                this,
+//                15,
+//                10,
+//                5,
+//                4,
+//                3,
+//                2,
+//                1
+//        ).runTaskTimer(Reality.getPlugin(), 0, 20);
         //20 ticks == 1 second
     }
 
@@ -222,8 +235,7 @@ public class BRoom {
     public void bossDie(Entity entity){
         bossesPathFinding.stopPathFinding(bossNPC);
         CitizensAPI.getNPCRegistry().getNPC(entity).destroy();
-        new Countdown(
-                false,
+        bRoomManager.addStartCountDown(
                 10,
                 "Boss will respawn in %t seconds!",
                 this,
@@ -233,7 +245,18 @@ public class BRoom {
                 3,
                 2,
                 1
-        ).runTaskTimer(Reality.getPlugin(), 0, 20);
+        );
+//        (
+//                10,
+//                "Boss will respawn in %t seconds!",
+//                this,
+//                10,
+//                5,
+//                4,
+//                3,
+//                2,
+//                1
+//        ).runTaskTimer(Reality.getPlugin(), 0, 20);
     }
 
     public void stop(){
@@ -379,51 +402,47 @@ public class BRoom {
         return null;
     }
 
-    private class Countdown extends BukkitRunnable {
-
-        private int timer;
-        private String message;
-        private BRoom bRoom;
-        private List<Integer> countingNums;
-
-        public Countdown(boolean stop, int start, String message, BRoom bRoom, int... countingNums) {
-            if(stop){
-                stop();
-            }else{
-                this.timer = start;
-                this.message = message;
-                this.bRoom = bRoom;
-                this.countingNums = new ArrayList<Integer>();
-                for (int i : countingNums) this.countingNums.add(i);
-            }
-        }
-
-        public void run() {
-            if(!bRoom.getStop()){
-                if (timer == 0) {
-                    for (UUID player : bRoom.getPlayers()) {
-                        Bukkit.getPlayer(player).teleport(bRoom.getSpawn());
-                        msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
-                    }
-                    Bosses boss = bossesAPI.getBoss(bRoom.getBossType());
-                    bRoom.setBossNPC(boss.getNPC());
-                    boss.spawn(bRoom.getBossLocation());
-                    bossesPathFinding.startPathFinding(bRoom.getBossNPC(), bRoom.getBRoomName());
-                    bRoom.state = BRoomState.STARTED;
-                    Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
-                    cancel();
-                }
-
-                if (countingNums.contains(timer)) {
-                    for (UUID player : bRoom.getPlayers()){
-                        msg.send(Bukkit.getPlayer(player), "d", message.replace("%t", timer + ""));
-                    }
-                }
-                timer--;
-            }else{
-                cancel();
-            }
-        }
-    }
+//    private class Countdown extends BukkitRunnable {
+//
+//        private int timer;
+//        private String message;
+//        private BRoom bRoom;
+//        private List<Integer> countingNums;
+//
+//        public Countdown(int start, String message, BRoom bRoom, int... countingNums) {
+//            this.timer = start;
+//            this.message = message;
+//            this.bRoom = bRoom;
+//            this.countingNums = new ArrayList<Integer>();
+//            for (int i : countingNums) this.countingNums.add(i);
+//        }
+//
+//        public void run() {
+//            if(!bRoom.getStop()){
+//                if (timer == 0) {
+//                    for (UUID player : bRoom.getPlayers()) {
+//                        Bukkit.getPlayer(player).teleport(bRoom.getSpawn());
+//                        msg.send(Bukkit.getPlayer(player), "a", "The game has started!");
+//                    }
+//                    Bosses boss = bossesAPI.getBoss(bRoom.getBossType());
+//                    bRoom.setBossNPC(boss.getNPC());
+//                    boss.spawn(bRoom.getBossLocation());
+//                    bossesPathFinding.startPathFinding(bRoom.getBossNPC(), bRoom.getBRoomName());
+//                    bRoom.state = BRoomState.STARTED;
+//                    Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
+//                    cancel();
+//                }
+//
+//                if (countingNums.contains(timer)) {
+//                    for (UUID player : bRoom.getPlayers()){
+//                        msg.send(Bukkit.getPlayer(player), "d", message.replace("%t", timer + ""));
+//                    }
+//                }
+//                timer--;
+//            }else{
+//                cancel();
+//            }
+//        }
+//    }
 
 }

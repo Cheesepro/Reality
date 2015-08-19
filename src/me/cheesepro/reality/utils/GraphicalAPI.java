@@ -114,5 +114,15 @@ public class GraphicalAPI {
         p.setScoreboard(s);
     }
 
+    public static void setCustomName(Player p, String prefix, String suffix){
+        //TODO add custom names
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard board = manager.getNewScoreboard();
+        Team team = board.registerNewTeam("LOL");
+        team.addEntry("MarkCP");
+        team.setPrefix(ChatColor.GREEN + "[Lv.99] " + ChatColor.RESET);
+
+        Bukkit.getPlayer("JinCongIsFai").setScoreboard(board);
+    }
 
 }

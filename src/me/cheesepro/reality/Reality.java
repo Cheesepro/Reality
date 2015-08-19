@@ -38,13 +38,33 @@ public class Reality extends JavaPlugin implements Listener{
      * The map that stores all the settings of the plugin.
      * Format: Map(Setting, List(value))
      */
-    public Map<String, List<String>> settings = new HashMap<String, List<String>>();
+    private Map<String, List<String>> settings = new HashMap<String, List<String>>();
 
     /*
      * This map stores all the information about ranks such as the name, health, starting-kits and abilities of a rank.</b>
      * Format: (Rank name, Map(name/health/starting-kits/abilities, List(value)))
      */
-    public Map<String, Map<String, List<String>>> ranks = new HashMap<String, Map<String, List<String>>>();
+//    private Map<String, Map<String, List<String>>> ranks = new HashMap<String, Map<String, List<String>>>();
+
+    /*
+     * This map stores name information about ranks
+     */
+    private Map<String, String> ranksName = new HashMap<String, String>();
+
+    /*
+     * This map stores health information about ranks
+     */
+    private Map<String, Double> ranksHealth = new HashMap<String, Double>();
+
+    /*
+     * This map stores starting-kits information about ranks
+     */
+    private Map<String, List<String>> ranksKit = new HashMap<String, List<String>>();
+
+    /*
+     * This map stores what ability(ies) ranks have
+     */
+    private Map<String, List<String>> ranksAbilities = new HashMap<String, List<String>>();
 
     /*
      * This map stores how much XP are each level needed.
@@ -88,7 +108,7 @@ public class Reality extends JavaPlugin implements Listener{
     /*
      * This array contains all the Abilities.
      */
-    private Abilities abilities[] = new Abilities[9];
+    private Abilities abilities[] = new Abilities[10];
 
     /*
      * This is the list that contains all the prizes in the crates
@@ -268,6 +288,7 @@ public class Reality extends JavaPlugin implements Listener{
         new BRoomShopInvListener(this);
         new BRoomIdleListeners(this);
         new EntityDamageListener(this);
+        new PlayerInteractListener(this);
     }
 
     private void registerAbilities(){
@@ -280,6 +301,7 @@ public class Reality extends JavaPlugin implements Listener{
         abilities[6] = new AbilityCobweb(this);
         abilities[7] = new AbilityLightning(this);
         abilities[8] = new AbilityFeed(this);
+        abilities[9] = new AbilityHyperJump(this);
     }
 
     private void registerBosses(){
@@ -346,34 +368,33 @@ public class Reality extends JavaPlugin implements Listener{
             }
         }
         if(ranksConfig.get("ranks")!=null){
-            for(String cache : ranksConfig.getConfigurationSection("ranks").getKeys(false)){
-                Map<String, List<String>> mapCache = new HashMap<String, List<String>>();
-                List<String> healthCache = new ArrayList<String>();
-                List<String> kitsCache = new ArrayList<String>();
-                if(ranksConfig.get("ranks."+cache+".health") != null){
-                    healthCache.add(String.valueOf(ranksConfig.get("ranks." + cache + ".health")));
-                    mapCache.put("health", healthCache);
+            for(String rank : ranksConfig.getConfigurationSection("ranks").getKeys(false)){
+                if(ranksConfig.get("ranks."+rank+".name") != null){
+                    ranksName.put(rank, String.valueOf(ranksConfig.get("ranks." + rank + ".name")));
                 }
-                if(ranksConfig.get("ranks."+cache+".starting-kit") != null){
-                    for(String kititemcache : ranksConfig.getConfigurationSection("ranks."+cache+".starting-kit").getKeys(false)){
-                        if(ranksConfig.get("ranks."+cache+".starting-kit."+kititemcache+".item_name")!=null){
+                if(ranksConfig.get("ranks."+rank+".health") != null){
+                    ranksHealth.put(rank, Double.parseDouble(String.valueOf(ranksConfig.get("ranks." + rank + ".health"))));
+                }
+                if(ranksConfig.get("ranks."+rank+".starting-kit") != null){
+                    List<String> kitsCache = new ArrayList<String>();
+                    for(String kititemcache : ranksConfig.getConfigurationSection("ranks."+rank+".starting-kit").getKeys(false)){
+                        if(ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name")!=null){
                             kitsCache.add(kititemcache+
-                                    "#"+ ranksConfig.get("ranks."+cache+".starting-kit."+kititemcache+".amount")+
-                                    "#"+ ranksConfig.get("ranks."+cache+".starting-kit."+kititemcache+".item_name"));
+                                    "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount")+
+                                    "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name"));
                         }else{
-                            kitsCache.add(kititemcache+"#"+ranksConfig.get("ranks."+cache+".starting-kit."+kititemcache+".amount"));
+                            kitsCache.add(kititemcache+"#"+ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount"));
                         }
                     }
-                    mapCache.put("starting-kit", kitsCache);
+                    ranksKit.put(rank, kitsCache);
                 }
-                if(ranksConfig.get("ranks."+cache+".abilities") !=null){
+                if(ranksConfig.get("ranks."+rank+".abilities") !=null){
                     List<String> abCache = new ArrayList<String>();
-                    for(String ability : ranksConfig.getStringList("ranks."+cache+".abilities")){
+                    for(String ability : ranksConfig.getStringList("ranks."+rank+".abilities")){
                         abCache.add(ability.toUpperCase());
                     }
-                    mapCache.put("abilities", abCache);
+                    ranksAbilities.put(rank, abCache);
                 }
-                ranks.put(cache, mapCache);
             }
         }
 
@@ -621,8 +642,25 @@ public class Reality extends JavaPlugin implements Listener{
         return plugin;
     }
 
-    public Map<String, Map<String, List<String>>> getRanks() {
-        return ranks;
+//    public Map<String, Map<String, List<String>>> getRanks() {
+//        return ranks;
+//    }
+
+
+    public Map<String, String> getRanksName() {
+        return ranksName;
+    }
+
+    public Map<String, List<String>> getRanksKit() {
+        return ranksKit;
+    }
+
+    public Map<String, Double> getRanksHealth() {
+        return ranksHealth;
+    }
+
+    public Map<String, List<String>> getRanksAbilities() {
+        return ranksAbilities;
     }
 
     public Map<String, Map<String, String>> getAbilitiesOptions() {

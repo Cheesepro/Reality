@@ -92,7 +92,7 @@ public class BossesPathFinding {
                                                 npc1.getNavigator().setTarget(target, true);
                                             }
                                         }
-                                        if(npc1.isSpawned() && npc1.getEntity().isValid() && npc1!=null){
+                                        if(npc1.isSpawned() && npc1.getEntity().isValid()){
                                             if(bossXLoc.containsKey(npc1.getUniqueId()) && bossZLoc.containsKey(npc1.getUniqueId())){
                                                 if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
                                                     if(bossStillCount.containsKey(npc1.getUniqueId())){
@@ -121,8 +121,8 @@ public class BossesPathFinding {
                             }
                         }
                     }
-                }.runTaskTimer(plugin, 0, 20);
-                //10 ticks = 0.5 sec;
+                }.runTaskTimerAsynchronously(plugin, 0, 20);
+                //20 ticks = 1 sec;
             }
         }
     }

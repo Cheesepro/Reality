@@ -19,7 +19,10 @@ public class DataManager {
 
     private Reality plugin = Reality.getPlugin();
     private Map<String, List<String>> settings;
-    private Map<String, Map<String, List<String>>> ranks;
+    private Map<String, String> ranksName;
+    private Map<String, Double> ranksHealth;
+    private Map<String, List<String>> ranksKit;
+    private Map<String, List<String>> ranksAbilities;
     private Map<String, Integer> levels;
     private Map<String, NavigableSet<String>> levelLimits;
     private NavigableSet<String> blockedItems;
@@ -56,6 +59,10 @@ public class DataManager {
 
     public DataManager(Reality plugin){
         this.plugin = plugin;
+        ranksAbilities = plugin.getRanksAbilities();
+        ranksHealth = plugin.getRanksHealth();
+        ranksKit = plugin.getRanksKit();
+        ranksName = plugin.getRanksName();
         abilitiesOptions = plugin.getAbilitiesOptions();
         blockedItems = plugin.getBlockedItems();
         bossesTypes = plugin.getBossesTypes();
@@ -74,7 +81,6 @@ public class DataManager {
         levelsSet = plugin.getLevelsSet();
         messages = plugin.getMessages();
         playersINFO = plugin.getPlayersINFO();
-        ranks = plugin.getRanks();
         settings = plugin.getSettings();
         bRoomPlayersRole = plugin.getbRoomPlayersRole();
         bRoomPlayersRoom = plugin.getbRoomPlayersRoom();
@@ -87,6 +93,38 @@ public class DataManager {
         cratesConfig = plugin.getCratesConfig();
         bossRoomsConfig = plugin.getBossRoomsConfig();
         bRoomIdle = plugin.getbRoomIdle();
+    }
+
+    public String getRanksName(String rank){
+        return ranksName.get(rank);
+    }
+
+    public Boolean containsRanksName(String rank){
+        return ranksName.containsKey(rank);
+    }
+
+    public Double getRanksHealth(String rank){
+        return ranksHealth.get(rank);
+    }
+
+    public Boolean containsRanksHealth(String rank){
+        return ranksHealth.containsKey(rank);
+    }
+
+    public List<String> getRanksAbilities(String rank){
+        return ranksAbilities.get(rank);
+    }
+
+    public Boolean containsRanksAbilities(String rank){
+        return ranksAbilities.containsKey(rank);
+    }
+
+    public List<String> getRanksKit(String rank){
+        return ranksKit.get(rank);
+    }
+
+    public Boolean containsRanksKit(String rank){
+        return ranksKit.containsKey(rank);
     }
 
     public String getBossesWorld(){

@@ -3,9 +3,9 @@
      item: BLAZE_ROD
      item_name: "Explode STICK"
      cooldown: 10
-   Teleport:
+   HYPERJUMP:
      item: NETHER_STAR
-     item_name: "Teleporter"
+     item_name: "Hyper Jumper"
      cooldown: 5
    FIREBALL:
      item: FIREBALL
@@ -32,3 +32,7 @@
      item: SPECKLED_MELON
      item_name: "Feeder"
      cooldown: 60
+   TELEPORT:
+     item: DIAMOND_BARDING
+     item_name: "Teleporter"
+     cooldown: 5

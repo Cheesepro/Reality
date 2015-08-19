@@ -20,7 +20,6 @@ import java.util.UUID;
 public class PlacingPreventer implements Listener{
 
     private Reality plugin;
-    private Map<String, Map<String, List<String>>> ranks;
     private Map<String, Map<String, String>> abilitiesOptions;
     private Tools tools;
     private Map<UUID, Map<String, String>> playersINFO;
@@ -29,7 +28,6 @@ public class PlacingPreventer implements Listener{
 
     public PlacingPreventer(Reality plugin){
         this.plugin = plugin;
-        ranks = plugin.getRanks();
         abilitiesOptions = plugin.getAbilitiesOptions();
         playersINFO = plugin.getPlayersINFO();
         tools = new Tools(plugin);
@@ -41,9 +39,8 @@ public class PlacingPreventer implements Listener{
     @EventHandler
     public void noPlace(BlockPlaceEvent e){
         Player p = e.getPlayer();
-        Map<String, List<String>> mapCache = ranks.get(playersINFO.get(p.getUniqueId()).get("rank"));
-        if(mapCache.get("abilities")!=null) {
-            List<String> listCache = mapCache.get("abilities");
+        if(dataManager.containsRanksAbilities(playersINFO.get(p.getUniqueId()).get("rank"))) {
+            List<String> listCache = dataManager.getRanksAbilities(playersINFO.get(p.getUniqueId()).get("rank"));
             if (listCache.contains("FIREBALL")) {
                 if(tools.isHoldingCorrectItem(p, abilitiesOptions.get("FIREBALL").get("item"))){
                     e.setCancelled(true);
