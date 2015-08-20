@@ -29,7 +29,6 @@ public class BossesPathFinding {
 
     private Reality plugin;
     private static Map<UUID, String> bossNPCsINFO = new HashMap<UUID, String>();
-//    private static List<NPC> bossNPCs = new ArrayList<NPC>();
     private static boolean isPathFindingTaskRunning;
     private Messenger msg;
     private WorldGuardPlugin worldGuard;
@@ -122,6 +121,7 @@ public class BossesPathFinding {
                         }
                     }
                 }.runTaskTimerAsynchronously(plugin, 0, 20);
+                //TODO FIX UNSAFE THREAD
                 //20 ticks = 1 sec;
             }
         }

@@ -1,22 +1,16 @@
 package me.cheesepro.reality.utils;
 
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
-import net.minecraft.server.v1_8_R3.ChatComponentText;
-import net.minecraft.server.v1_8_R3.Packet;
-
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Team;
+
+import java.util.*;
 
 
 /**
@@ -62,56 +56,162 @@ public class GraphicalAPI {
         ((CraftPlayer)p1).getHandle().playerConnection.sendPacket(p);
     }
 
-    public static void createScoreboard(Player p, String title, String[] text){
-        //Create new Scoreboard
+    public static boolean unrankedSidebarDisplay(Player p, String[] elements) {
+        return unrankedSidebarDisplay((Collection) Arrays.asList(new Player[]{p}), elements);
+    }
 
-        ScoreboardManager mgr = Bukkit.getScoreboardManager();
-        Scoreboard s = mgr.getNewScoreboard();
-
-        //Create objective
-
-
-        Objective obj = s.registerNewObjective("sb", "dummy");
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        obj.setDisplayName(title);
-
-
-        //Add lines
-
-        int value = text.length;
-        for(String x : text){
-            String pre = "";
-            for(char c : (value+"").toCharArray()){
-                pre+="¡ì"+c;
+    public static boolean unrankedSidebarDisplay(Collection<Player> players, String[] elements) {
+        if(elements.length > 16) {
+            return false;
+        } else {
+            if(elements[0] == null) {
+                elements[0] = "Unamed board";
             }
-            pre+="¡ìf";
-            x=pre+x;
-            if(x.length()<=16){
-                obj.getScore(x).setScore(value);
-            }else{
-                Team team = s.registerNewTeam("line"+value);
-                String prefix = x.substring(0, 16);
-                String name = x.substring(16, x.length());
-                String suffix = "";
-                if(name.length()>16){
-                    name = name.substring(0, 16);
-                    suffix = x.substring(32, x.length());
-                    if(suffix.length()>16)suffix = suffix.substring(0, 16);
+
+            if(elements[0].length() > 32) {
+                elements[0] = elements[0].substring(0, 40);
+            }
+
+            for(int e = 1; e < elements.length; ++e) {
+                if(elements[e] != null && elements[e].length() > 40) {
+                    elements[e] = elements[e].substring(0, 40);
                 }
-                team.setPrefix(prefix);
-                team.setSuffix(suffix);
-                OfflinePlayer op = Bukkit.getOfflinePlayer(name);
-                team.addPlayer(op);
-                obj.getScore(op).setScore(value);
             }
 
+            try {
+                Iterator var3 = players.iterator();
 
-            value--;
+                while(var3.hasNext()) {
+                    Player var12 = (Player)var3.next();
+                    if(var12.getScoreboard() == null || var12.getScoreboard().getObjective(var12.getUniqueId().toString().substring(0, 16)) == null) {
+                        var12.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+                        var12.getScoreboard().registerNewObjective(var12.getUniqueId().toString().substring(0, 16), "dummy");
+                        var12.getScoreboard().getObjective(var12.getUniqueId().toString().substring(0, 16)).setDisplaySlot(DisplaySlot.SIDEBAR);
+                    }
+
+                    var12.getScoreboard().getObjective(DisplaySlot.SIDEBAR).setDisplayName(elements[0]);
+
+                    for(int entry = 1; entry < elements.length; ++entry) {
+                        if(elements[entry] != null && var12.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(elements[entry]).getScore() != 16 - entry) {
+                            var12.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(elements[entry]).setScore(16 - entry);
+                            Iterator toErase = var12.getScoreboard().getEntries().iterator();
+
+                            while(toErase.hasNext()) {
+                                String string = (String)toErase.next();
+                                if(var12.getScoreboard().getObjective(var12.getUniqueId().toString().substring(0, 16)).getScore(string).getScore() == 16 - entry && string != elements[entry]) {
+                                    var12.getScoreboard().resetScores(string);
+                                }
+                            }
+                        }
+                    }
+
+                    Iterator var14 = var12.getScoreboard().getEntries().iterator();
+
+                    while(var14.hasNext()) {
+                        String var13 = (String)var14.next();
+                        boolean var15 = true;
+                        String[] var10 = elements;
+                        int var9 = elements.length;
+
+                        for(int var8 = 0; var8 < var9; ++var8) {
+                            String element = var10[var8];
+                            if(element != null && element.equals(var13) && var12.getScoreboard().getObjective(var12.getUniqueId().toString().substring(0, 16)).getScore(var13).getScore() == 16 - Arrays.asList(elements).indexOf(element)) {
+                                var15 = false;
+                                break;
+                            }
+                        }
+
+                        if(var15) {
+                            var12.getScoreboard().resetScores(var13);
+                        }
+                    }
+                }
+
+                return true;
+            } catch (Exception var11) {
+                return false;
+            }
+        }
+    }
+
+    public static boolean rankedSidebarDisplay(Player p, String title, HashMap<String, Integer> elements) {
+        return rankedSidebarDisplay((Collection)Arrays.asList(new Player[]{p}), title, elements);
+    }
+
+    public static boolean rankedSidebarDisplay(Collection<Player> players, String title, HashMap<String, Integer> elements) {
+        if(title == null) {
+            title = "Unamed board";
         }
 
-        //Set the Scoreboard for the Player
+        if(title.length() > 32) {
+            title = title.substring(0, 32);
+        }
 
-        p.setScoreboard(s);
+        String e;
+        String string;
+        Iterator var6;
+        label88:
+        for(; elements.size() > 15; elements.remove(e)) {
+            e = (String)elements.keySet().toArray()[0];
+            int minimum = elements.get(e);
+            var6 = elements.keySet().iterator();
+
+            while(true) {
+                do {
+                    if(!var6.hasNext()) {
+                        continue label88;
+                    }
+
+                    string = (String)var6.next();
+                } while(elements.get(string) >= minimum && (elements.get(string) != minimum || string.compareTo(e) >= 0));
+
+                e = string;
+                minimum = elements.get(string);
+            }
+        }
+
+        for (Object o : (new ArrayList(elements.keySet()))) {
+            e = (String) o;
+            if (e != null && e.length() > 40) {
+                int string1 = elements.get(e);
+                elements.remove(e);
+                elements.put(e.substring(0, 40), string1);
+            }
+        }
+
+        try {
+
+            for (Player e1 : players) {
+                if (e1.getScoreboard() == null || e1.getScoreboard().getObjective(e1.getUniqueId().toString().substring(0, 16)) == null) {
+                    e1.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+                    e1.getScoreboard().registerNewObjective(e1.getUniqueId().toString().substring(0, 16), "dummy");
+                    e1.getScoreboard().getObjective(e1.getUniqueId().toString().substring(0, 16)).setDisplaySlot(DisplaySlot.SIDEBAR);
+                }
+
+                e1.getScoreboard().getObjective(DisplaySlot.SIDEBAR).setDisplayName(title);
+                var6 = elements.keySet().iterator();
+
+                while (var6.hasNext()) {
+                    string = (String) var6.next();
+                    if (e1.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(string).getScore() != elements.get(string)) {
+                        e1.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(string).setScore(elements.get(string));
+                    }
+                }
+
+                var6 = new ArrayList(e1.getScoreboard().getEntries()).iterator();
+
+                while (var6.hasNext()) {
+                    string = (String) var6.next();
+                    if (!elements.keySet().contains(string)) {
+                        e1.getScoreboard().resetScores(string);
+                    }
+                }
+            }
+
+            return true;
+        } catch (Exception var7) {
+            return false;
+        }
     }
 
     public static void setCustomName(Player p, String prefix, String suffix){
