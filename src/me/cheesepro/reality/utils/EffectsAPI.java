@@ -1,12 +1,12 @@
 package me.cheesepro.reality.utils;
 
-import me.cheesepro.reality.Reality;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -14,33 +14,28 @@ import java.util.UUID;
  */
 public class EffectsAPI {
 
-    private Reality plugin;
-    private Tools tools;
-    private List<Color> randomColors = new ArrayList<Color>();
+    private static List<Color> randomColors = new ArrayList<Color>(){{
+            add(Color.AQUA);
+            add(Color.BLACK);
+            add(Color.BLUE);
+            add(Color.GRAY);
+            add(Color.GREEN);
+            add(Color.LIME);
+            add(Color.MAROON);
+            add(Color.OLIVE);
+            add(Color.ORANGE);
+            add(Color.PURPLE);
+            add(Color.RED);
+            add(Color.SILVER);
+            add(Color.WHITE);
+            add(Color.YELLOW);
+            add(Color.TEAL);
+        }
+    };
 
-    public enum PlayEffect{EXPLODE, LOVE, MUSIC, SMOKE, CLOUD, ENDER, CRIT, FIRE}
+    public enum PlayEffect{EXPLODE, LOVE, MUSIC, SMOKE, CLOUD, ENDER, CRIT, FIRE, MAD}
 
-    public EffectsAPI(Reality plugin){
-        this.plugin = plugin;
-        tools = new Tools(plugin);
-        randomColors.add(Color.AQUA);
-        randomColors.add(Color.BLACK);
-        randomColors.add(Color.BLUE);
-        randomColors.add(Color.GRAY);
-        randomColors.add(Color.GREEN);
-        randomColors.add(Color.LIME);
-        randomColors.add(Color.MAROON);
-        randomColors.add(Color.OLIVE);
-        randomColors.add(Color.ORANGE);
-        randomColors.add(Color.PURPLE);
-        randomColors.add(Color.RED);
-        randomColors.add(Color.SILVER);
-        randomColors.add(Color.WHITE);
-        randomColors.add(Color.YELLOW);
-        randomColors.add(Color.TEAL);
-    }
-
-    public void firework(UUID id, FireworkEffect.Type fireworkEffect){
+    public static void firework(UUID id, FireworkEffect.Type fireworkEffect){
         Location loc = Bukkit.getPlayer(id).getLocation();
         loc.setY(loc.getY() - 1);
         Firework f = Bukkit.getPlayer(id).getWorld().spawn(loc, Firework.class);
@@ -58,9 +53,10 @@ public class EffectsAPI {
         f.setFireworkMeta(fm);
     }
 
-    public void effect(Location loc, PlayEffect playEffect){
+    public static void effect(Location loc, PlayEffect playEffect){
+        loc.setY(loc.getY()+1);
         switch (playEffect){
-            case CRIT: for(int i = 0; i<10; i++){loc.getWorld().playEffect(loc, Effect.CRIT, null);}
+            case CRIT: for(int i = 0; i<45; i++){loc.getWorld().playEffect(loc, Effect.MAGIC_CRIT, null);}
                 break;
             case CLOUD: for(int i = 0; i<25; i++){loc.getWorld().playEffect(loc, Effect.CLOUD, null);}
                 break;
@@ -76,12 +72,23 @@ public class EffectsAPI {
                 break;
             case FIRE:  for(int i = 0; i<3; i++){loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, null);}
                 break;
+            case MAD:
+                Location loc1 = new Location(loc.getWorld(), loc.getX() + 0.3, loc.getY()+1, loc.getZ());
+                Location loc2 = new Location(loc.getWorld(), loc.getX() - 0.3, loc.getY()+1, loc.getZ());
+                loc.getWorld().playEffect(loc, Effect.VILLAGER_THUNDERCLOUD, null);
+                loc.getWorld().playEffect(loc1, Effect.VILLAGER_THUNDERCLOUD, null);
+                loc.getWorld().playEffect(loc2, Effect.VILLAGER_THUNDERCLOUD, null);
         }
     }
 
-    private Color getRandomColor(){
-        int randInt = tools.randInt(0, randomColors.size()-1);
+    private static Color getRandomColor(){
+        int randInt = randInt(0, randomColors.size()-1);
         return randomColors.get(randInt);
+    }
+
+    public static int randInt(int min, int max) {
+        Random rand = new Random();
+        return rand.nextInt((max - min) + 1) + min;
     }
 
 }

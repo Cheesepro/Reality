@@ -5,6 +5,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.cheesepro.reality.Reality;
+import me.cheesepro.reality.bossrooms.bosses.BossSkeleton;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.EffectsAPI;
 import me.cheesepro.reality.utils.Messenger;
@@ -36,14 +37,14 @@ public class BossesPathFinding {
     private Map<UUID, Integer> bossXLoc = new HashMap<UUID, Integer>();
     private Map<UUID, Integer> bossZLoc = new HashMap<UUID, Integer>();
     private Map<UUID, Double> bossStillCount = new HashMap<UUID, Double>();
-    private EffectsAPI effectsAPI;
+    private BossSkeleton bossSkeleton;
 
     public BossesPathFinding(Reality plugin){
         this.plugin = plugin;
         msg = new Messenger(plugin);
         dataManager = new DataManager(plugin);
         worldGuard = plugin.getWorldGuard();
-        effectsAPI = new EffectsAPI(plugin);
+        bossSkeleton = new BossSkeleton(plugin);
     }
 
     public void startPathFinding(NPC npc, String bRoomName){
@@ -96,7 +97,7 @@ public class BossesPathFinding {
                                                 if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
                                                     if(bossStillCount.containsKey(npc1.getUniqueId())){
                                                         if(bossStillCount.get(npc1.getUniqueId())>=0.5*6){
-                                                            effectsAPI.effect(npc1.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
+                                                            EffectsAPI.effect(npc1.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
                                                             npc1.teleport(centerLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
                                                             bossStillCount.put(npc1.getUniqueId(), 0.5);
                                                         }else{

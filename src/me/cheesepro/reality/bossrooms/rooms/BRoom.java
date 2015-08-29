@@ -198,15 +198,15 @@ public class BRoom {
         //TODO add Sign support
         Bukkit.getServer().getPluginManager().callEvent(new BRoomUpdateEvent());
         bRoomManager.addStartCountDown(
-                15,
+                1,
                 "Boss Room " + getBRoomName() + " is starting in %t seconds!",
                 this,
-                15,
-                10,
-                5,
-                4,
-                3,
-                2,
+//                15,
+//                10,
+//                5,
+//                4,
+//                3,
+//                2,
                 1
         );
 //        new Countdown(
@@ -274,6 +274,11 @@ public class BRoom {
                     }
                     if(entity instanceof Item){
                         entity.remove();
+                    }
+                    if(entity.isCustomNameVisible()){
+                        if(entity.getCustomName().equalsIgnoreCase(ChatColor.RED + "!!!")){
+                            entity.remove();
+                        }
                     }
                 }
             }

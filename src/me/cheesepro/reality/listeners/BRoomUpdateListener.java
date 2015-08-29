@@ -5,6 +5,7 @@ import me.cheesepro.reality.bossrooms.BossesAPI;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.eventhandlers.BRoomUpdateEvent;
 import me.cheesepro.reality.utils.DataManager;
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -45,6 +46,10 @@ public class BRoomUpdateListener implements Listener{
                 lore.add(ChatColor.GOLD.toString() + "Boss: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getName());
                 lore.add(ChatColor.GOLD.toString() + "Boss Health: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getHealth());
                 lore.add(ChatColor.GOLD.toString() + "Boss Damage: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getDamage());
+                String[] skillParts = WordUtils.wrap(ChatColor.GOLD.toString() + "Boss Ability: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getSkills(), 35, "#", true).split("#");
+                for(String part : skillParts){
+                    lore.add(ChatColor.LIGHT_PURPLE +part.replace("#", ""));
+                }
                 lore.add(ChatColor.GOLD.toString() + "Room Status: " + ChatColor.LIGHT_PURPLE + bRoomManager.getBRoom(bRoom).getState());
                 lore.add(ChatColor.GOLD.toString() + "Slots: " + ChatColor.LIGHT_PURPLE + bRoomManager.getBRoom(bRoom).getCurrentPlayers() + "/" + bRoomManager.getBRoom(bRoom).getMaxPlayer());
                 lore.add(ChatColor.GOLD.toString() + "Cost: " + ChatColor.LIGHT_PURPLE + "$" + bossesAPI.getBoss(bossType).getRewardMoney() * 3);
@@ -77,6 +82,10 @@ public class BRoomUpdateListener implements Listener{
                 lore.add(ChatColor.GOLD.toString() + "Boss: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getName());
                 lore.add(ChatColor.GOLD.toString() + "Boss Health: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getHealth());
                 lore.add(ChatColor.GOLD.toString() + "Boss Damage: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getDamage());
+                String[] skillParts = WordUtils.wrap(ChatColor.GOLD.toString() + "Boss Ability: " + ChatColor.LIGHT_PURPLE + bossesAPI.getBoss(bossType).getSkills(), 35, "#", true).split("#");
+                for(String part : skillParts){
+                    lore.add(ChatColor.LIGHT_PURPLE +part.replace("#", ""));
+                }
                 lore.add(ChatColor.GOLD.toString() + "Room Status: " + ChatColor.LIGHT_PURPLE + bRoomManager.getBRoom(bRoom).getState());
                 lore.add(ChatColor.GOLD.toString() + "Slots: " + ChatColor.LIGHT_PURPLE + bRoomManager.getBRoom(bRoom).getCurrentPlayers() + "/" + bRoomManager.getBRoom(bRoom).getMaxPlayer());
                 lore.add(ChatColor.GOLD.toString() + "Cost: " + ChatColor.LIGHT_PURPLE + "$" + bossesAPI.getBoss(bossType).getRewardMoney() * 3);

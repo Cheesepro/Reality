@@ -19,7 +19,6 @@ public class PlayerManager {
     private Config storageConfig;
     private Messenger msg;
     private DataManager dataManager;
-    private EffectsAPI effectsAPI;
 
     public PlayerManager(Reality plugin){
         this.plugin = plugin;
@@ -28,7 +27,6 @@ public class PlayerManager {
         levels = plugin.getLevels();
         msg = new Messenger(plugin);
         dataManager = new DataManager(plugin);
-        effectsAPI = new EffectsAPI(plugin);
     }
 
     public String getRank(UUID id){
@@ -114,9 +112,9 @@ public class PlayerManager {
             String next = String.valueOf(nextH);
             if(Integer.parseInt(playersINFO.get(id).get("xp"))>=levels.get(next)){
                 setLevel(id, nextH);
-                effectsAPI.firework(id, FireworkEffect.Type.STAR);
-                effectsAPI.firework(id, FireworkEffect.Type.BALL_LARGE);
-                effectsAPI.firework(id, FireworkEffect.Type.BURST);
+                EffectsAPI.firework(id, FireworkEffect.Type.STAR);
+                EffectsAPI.firework(id, FireworkEffect.Type.BALL_LARGE);
+                EffectsAPI.firework(id, FireworkEffect.Type.BURST);
                 GraphicalAPI.sendTitleToPlayer(Bukkit.getPlayer(id), 1, 8, 1, "&a&lLeveled up!", "&f&lYou are now level " + next);
                 msg.send(Bukkit.getPlayer(id), "d", "Leveled UP! You are now level " + next);
                 return "yes";

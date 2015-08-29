@@ -39,7 +39,6 @@ public class CoolDownManager {
                 @Override
                 public void run()
                 {
-                    System.out.print(cooldownTime);
                     isTaskRunning=true;
                     if(cooldownTime.isEmpty() || cooldownTime.toString().equalsIgnoreCase("{}"))
                     {

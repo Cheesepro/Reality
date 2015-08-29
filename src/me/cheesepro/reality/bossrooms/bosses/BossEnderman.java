@@ -3,13 +3,16 @@ package me.cheesepro.reality.bossrooms.bosses;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import me.cheesepro.reality.utils.EffectsAPI;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Endermite;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -22,7 +25,7 @@ public class BossEnderman implements Bosses {
     Reality plugin;
     BossesAPI bossesAPI;
     String name = ChatColor.LIGHT_PURPLE.toString() + "Enderman";
-    String skill = "Once the boss is at 50% health, he will clone himself so that there are 2 bossrooms to kill with 25% of health each.";
+    String skill = "Spawns 6 Endermites upon spawn.";
     Integer health = 150;
     Integer damage = 6;
     Integer rewardXP = 5000;
@@ -90,9 +93,22 @@ public class BossEnderman implements Bosses {
         PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 2);
         creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
+        useAbility(loc);
     }
 
     public void spawn(Location loc){
         spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+    }
+
+    public void useAbility(Location loc){
+        for(int i = 0; i<6; i++){
+            Endermite endermite = loc.getWorld().spawn(loc, Endermite.class);
+            endermite.setCustomName(ChatColor.RED + "!!!");
+            endermite.setCustomNameVisible(true);
+        }
+    }
+
+    public void onHit(Player p){
+        EffectsAPI.effect(p.getLocation(), EffectsAPI.PlayEffect.ENDER);
     }
 }
