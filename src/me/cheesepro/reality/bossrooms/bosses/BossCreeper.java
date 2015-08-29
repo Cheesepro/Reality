@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -98,7 +99,9 @@ public class BossCreeper implements Bosses {
         spawn(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
     }
 
-    public void useAbility(Player p){
+    public void useAbility(Player p, Entity entity){
         EffectsAPI.effect(p.getLocation(), EffectsAPI.PlayEffect.EXPLODE);
+        float knockback = 2;
+        p.setVelocity(p.getVelocity().add(p.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(knockback)));
     }
 }

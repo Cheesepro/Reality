@@ -3,6 +3,7 @@ package me.cheesepro.reality.bossrooms.bosses;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.Bosses;
 import me.cheesepro.reality.bossrooms.BossesAPI;
+import me.cheesepro.reality.utils.EffectsAPI;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
@@ -11,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 
@@ -106,6 +108,10 @@ public class BossZombie implements Bosses {
             mob.setCustomName(ChatColor.RED + "!!!");
             mob.setCustomNameVisible(true);
         }
+    }
+
+    public void onHit(Player p){
+        EffectsAPI.effect(p.getLocation(), EffectsAPI.PlayEffect.SMOKE);
     }
 
 }

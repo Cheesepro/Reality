@@ -25,6 +25,7 @@ public class EntityDamageListener implements Listener{
     private BossEnderman bossEnderman;
     private BossCow bossCow;
     private BossPig bossPig;
+    private BossZombie bossZombie;
 
     public EntityDamageListener(Reality plugin){
         this.plugin = plugin;
@@ -36,6 +37,7 @@ public class EntityDamageListener implements Listener{
         bossEnderman = new BossEnderman(plugin);
         bossCow = new BossCow(plugin);
         bossPig = new BossPig(plugin);
+        bossZombie = new BossZombie(plugin);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -52,13 +54,15 @@ public class EntityDamageListener implements Listener{
                         }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("pig")){
                             bossPig.onHit((Player) e.getEntity());
                         }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("creeper")){
-                            bossCreeper.useAbility((Player)e.getEntity());
+                            bossCreeper.useAbility((Player)e.getEntity(), e.getDamager());
                         }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("skeleton")){
                             bossSkeleton.useAbility((Player)e.getEntity());
                         }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("blaze")){
                             bossBlaze.useAbility((Player) e.getEntity());
                         }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("enderman")){
                             bossEnderman.onHit((Player)e.getEntity());
+                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("zombie")){
+                            bossZombie.onHit((Player)e.getEntity());
                         }
                         e.setDamage(bossesAPI.getBoss(e.getDamager().getType().name()).getDamage());
                     }
