@@ -34,17 +34,17 @@ public class RespawnListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void respawnListener(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
-        p.setCanPickupItems(true); //FOR BOSSROOM AUTO RESPAWN
-        Location loc = new Location(Bukkit.getWorld(settings.get("respawnlocation").get(0)),
-                Double.parseDouble(settings.get("respawnlocation").get(1)),
-                Double.parseDouble(settings.get("respawnlocation").get(2)),
-                Double.parseDouble(settings.get("respawnlocation").get(3)),
-                Float.parseFloat(settings.get("respawnlocation").get(4)),
-                Float.parseFloat(settings.get("respawnlocation").get(5)));
+        p.setCanPickupItems(true);
         if (!dataManager.getInGamePlayersList().contains(p.getUniqueId())) {
+            Location loc = new Location(Bukkit.getWorld(settings.get("respawnlocation").get(0)),
+                    Double.parseDouble(settings.get("respawnlocation").get(1)),
+                    Double.parseDouble(settings.get("respawnlocation").get(2)),
+                    Double.parseDouble(settings.get("respawnlocation").get(3)),
+                    Float.parseFloat(settings.get("respawnlocation").get(4)),
+                    Float.parseFloat(settings.get("respawnlocation").get(5)));
             e.setRespawnLocation(loc);
+            rankGiver.giveRank(p);
         }
-        rankGiver.giveRank(p); //FOR BOSSROOM AUTO RESPAWN
     }
 
 }

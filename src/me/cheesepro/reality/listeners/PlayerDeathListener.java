@@ -31,6 +31,7 @@ public class PlayerDeathListener implements Listener{
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent e){
         if(bRoomManager.getBRoom(e.getEntity())!=null){
+            e.setKeepInventory(true);
             new BukkitRunnable() {
                 @Override
                 public void run() {
