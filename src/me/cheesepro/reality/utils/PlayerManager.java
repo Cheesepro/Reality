@@ -126,7 +126,7 @@ public class PlayerManager {
     }
 
     public boolean hasDefaultPermission(Player p){
-        if(p.hasPermission("reality.default") || p.hasPermission("reality.admin")){
+        if(p.hasPermission("reality.default")){
             return true;
         }else{
             return false;

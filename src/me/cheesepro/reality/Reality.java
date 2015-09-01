@@ -268,6 +268,8 @@ public class Reality extends JavaPlugin implements Listener{
     private void registerCommands(){
         CommandsManager commandsManager = new CommandsManager(this);
         getCommand("reality").setExecutor(commandsManager);
+        getCommand("bossroom").setExecutor(commandsManager);
+        getCommand("room").setExecutor(commandsManager);
     }
 
     private void registerListeners(){

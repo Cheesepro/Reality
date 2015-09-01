@@ -1,5 +1,5 @@
  name: Reality
- version: 1.0
+ version: 1.1
  description: Custom RPG for MineFutureMC
  author: Cheesepro
  website: http://RealityMC.com
@@ -9,6 +9,14 @@
  commands:
    reality:
      description: Reality's main command
+     permission: reality.default
+     permission-message: You don't have Permission!!
+   bossroom:
+     description: Bossroom command
+     permission: reality.default
+     permission-message: You don't have Permission!!
+   room:
+     description: Bossroom command (short)
      permission: reality.default
      permission-message: You don't have Permission!!
  permissions:

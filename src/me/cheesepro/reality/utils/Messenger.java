@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 /**
  * Created by Mark on 2015-04-03.
  */
@@ -29,13 +31,42 @@ public class Messenger {
     }
 
     public void important(Player p, String msg) {
-        p.sendMessage("");
-        p.sendMessage("");
+        empty(p);
+        empty(p);
         send(p, "4", ChatColor.STRIKETHROUGH + "-------------------[" + ChatColor.RESET.toString() + ChatColor.RED + ChatColor.BOLD.toString() + "IMPORTANT" + ChatColor.DARK_RED.toString() + ChatColor.STRIKETHROUGH + "]--------------------");
-        p.sendMessage("");
+        empty(p);
         send(p, "e", msg);
-        p.sendMessage("");
+        empty(p);
         send(p, "4", ChatColor.STRIKETHROUGH + "--------------------------------------------------");
+    }
+
+    public void help(Player p, List<String> lines){
+        empty(p);
+        empty(p);
+        send(p, "a", ChatColor.STRIKETHROUGH + "-----------------------[" + ChatColor.RESET.toString() + ChatColor.YELLOW + "HELP" + ChatColor.GREEN.toString() + ChatColor.STRIKETHROUGH + "]----------------------");
+        for(String line : lines){
+            send(p, "e", line);
+        }
+        send(p, "a", ChatColor.STRIKETHROUGH + "--------------------------------------------------");
+    }
+
+    public void board(Player p, String title, List<String> lines){
+        empty(p);
+        empty(p);
+        send(p, "e", ChatColor.STRIKETHROUGH + "-----------------------[" + ChatColor.RESET.toString() + ChatColor.LIGHT_PURPLE + title + ChatColor.YELLOW.toString() + ChatColor.STRIKETHROUGH + "]----------------------");
+        for(String line : lines){
+            send(p, "f", line);
+        }
+        send(p, "e", ChatColor.STRIKETHROUGH + "--------------------------------------------------");
+    }
+
+    public void empty(Player p){
+        p.sendMessage("");
+    }
+    public void empty(Player p, int amount){
+        for(int i = 0; i<amount; i++){
+            p.sendMessage("");
+        }
     }
 
     public void broadcast(String msg) {

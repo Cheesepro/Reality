@@ -33,7 +33,7 @@ public class BRoomShopInvListener implements Listener{
         if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.YELLOW.toString() + ChatColor.STRIKETHROUGH + "---------" + ChatColor.YELLOW + "[" + ChatColor.BLUE + "INFO" + ChatColor.YELLOW.toString() + "]" + ChatColor.STRIKETHROUGH + "---------")) {
             e.setCancelled(true);
             Player p = (Player) e.getWhoClicked();
-            p.performCommand("reality bossroom buy " + e.getCurrentItem().getItemMeta().getLore().get(0).replace(ChatColor.GOLD.toString() + "Room name: " + ChatColor.LIGHT_PURPLE, ""));
+            p.performCommand("bossroom " + e.getCurrentItem().getItemMeta().getLore().get(0).replace(ChatColor.GOLD.toString() + "Room name: " + ChatColor.LIGHT_PURPLE, ""));
             p.closeInventory();
         }
     }
