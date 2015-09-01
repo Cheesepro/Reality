@@ -36,7 +36,7 @@ public class BossesPathFinding {
     private DataManager dataManager;
     private Map<UUID, Integer> bossXLoc = new HashMap<UUID, Integer>();
     private Map<UUID, Integer> bossZLoc = new HashMap<UUID, Integer>();
-    private Map<UUID, Double> bossStillCount = new HashMap<UUID, Double>();
+    private Map<UUID, Integer> bossStillCount = new HashMap<UUID, Integer>();
     private BossSkeleton bossSkeleton;
 
     public BossesPathFinding(Reality plugin){
@@ -96,18 +96,18 @@ public class BossesPathFinding {
                                             if(bossXLoc.containsKey(npc1.getUniqueId()) && bossZLoc.containsKey(npc1.getUniqueId())){
                                                 if(bossXLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockX() && bossZLoc.get(npc1.getUniqueId())==npc1.getEntity().getLocation().getBlockZ()){
                                                     if(bossStillCount.containsKey(npc1.getUniqueId())){
-                                                        if(bossStillCount.get(npc1.getUniqueId())>=0.5*6){
+                                                        if(bossStillCount.get(npc1.getUniqueId())>=3){
                                                             EffectsAPI.effect(npc1.getEntity().getLocation(), EffectsAPI.PlayEffect.EXPLODE);
                                                             npc1.teleport(centerLoc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                                                            bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                            bossStillCount.put(npc1.getUniqueId(), 1);
                                                         }else{
-                                                            bossStillCount.put(npc1.getUniqueId(), bossStillCount.get(npc1.getUniqueId())+0.5);
+                                                            bossStillCount.put(npc1.getUniqueId(), bossStillCount.get(npc1.getUniqueId())+1);
                                                         }
                                                     }else{
-                                                        bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                        bossStillCount.put(npc1.getUniqueId(), 1);
                                                     }
                                                 }else{
-                                                    bossStillCount.put(npc1.getUniqueId(), 0.5);
+                                                    bossStillCount.put(npc1.getUniqueId(), 1);
                                                     bossXLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockX());
                                                     bossZLoc.put(npc1.getUniqueId(), npc1.getEntity().getLocation().getBlockZ());
                                                 }

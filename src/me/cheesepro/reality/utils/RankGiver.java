@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -40,7 +41,7 @@ public class RankGiver {
         dataManager = new DataManager(plugin);
     }
 
-    public void giveRank(Player p){
+    public void giveRank(final Player p){
         allowranks.clear();
         randomranks.clear();
         for (PermissionAttachmentInfo perm : p.getEffectivePermissions()) {
@@ -64,8 +65,6 @@ public class RankGiver {
             cache.put("rank", rank);
             playersINFO.put(p.getUniqueId(), cache);
         }
-//        Map<String, List<String>> mapCache = ranks.get(rank);
-//        List<String> listCache;
         if(dataManager.containsRanksHealth(rank)){
             p.setMaxHealth(dataManager.getRanksHealth(rank));
         }
@@ -107,6 +106,13 @@ public class RankGiver {
                 p.getInventory().addItem(item);
             }
         }
+        GraphicalAPI.sendTitleToPlayer(p, 1, 5, 0, ChatColor.YELLOW + "Reborn as", dataManager.getRanksName(rank));
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                GraphicalAPI.sendTitleToPlayer(p, 0, 5, 1, ChatColor.RED + "Please", ChatColor.GOLD + "Cherish your life");
+            }
+        }.runTaskLater(plugin, 6*20);
         randomranks.clear();
         allowranks.clear();
     }

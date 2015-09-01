@@ -15,6 +15,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -92,6 +94,8 @@ public class BossZombie implements Bosses {
         Creature creature = (Creature) npc.getEntity();
         ItemStack hat = new ItemStack(Material.DIAMOND_HELMET);
         creature.getEquipment().setHelmet(hat);
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 10000, 2);
+        creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
         useAbility(loc);
     }
