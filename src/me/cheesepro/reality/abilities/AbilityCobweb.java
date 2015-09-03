@@ -4,15 +4,15 @@ import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.Messenger;
 import me.cheesepro.reality.utils.Tools;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 import java.util.UUID;
@@ -65,15 +65,18 @@ public class AbilityCobweb implements Abilities, Listener{
                     Boolean anyone = false;
                     for (Entity e : p.getNearbyEntities(10, 10, 10)) {
                         if (e instanceof Player) {
-                            Player closestP = (Player) e;
-                            Location loc = closestP.getLocation();
-                            loc.setY(loc.getY() + 1);
-                            Block block = closestP.getWorld().getBlockAt(loc);
-                            if (block.getType() == Material.AIR) {
-                                block.setType(Material.WEB);
-                                anyone = true;
-                                msg.send(closestP, "6", "Some one got you with their ability!");
-                            }
+//                            Player closestP = (Player) e;
+//                            Location loc = closestP.getLocation();
+//                            loc.setY(loc.getY() + 1);
+//                            Block block = closestP.getWorld().getBlockAt(loc);
+//                            if (block.getType() == Material.AIR) {
+//                                block.setType(Material.WEB);
+//                                anyone = true;
+//                                msg.send(closestP, "6", "Some one got you with their ability!");
+//                            }
+                            PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOW, 3*20, 6);
+                            ((Player) e).addPotionEffect(potionEffect);
+                            anyone = true;
                         }
                     }
 

@@ -79,18 +79,19 @@ public class PlayerManager {
             if(getLevel(id)==99){
                 dataManager.depositPlayer(Bukkit.getPlayer(id), xp+0.0);
                 msg.send(Bukkit.getPlayer(id), "e", "You earned $" + xp);
-            }
-            storageConfig.set("players."+id.toString()+".xp", Integer.parseInt(playersINFO.get(id).get("xp"))+xp);
-            storageConfig.saveConfig();
-            Map<String, String> cache = playersINFO.get(id);
-            cache.put("xp", String.valueOf(Integer.parseInt(playersINFO.get(id).get("xp"))+xp));
-            playersINFO.put(id, cache);
-            if(levelUp(id)!=null){
-                String returnResult = levelUp(id);
-                if(returnResult.startsWith("no")){
-                    String[] splits = returnResult.split("#");
-                    String next = splits[1];
-                    msg.send(Bukkit.getPlayer(id), "a", splits[0].replace("no", "")+" more XP to level " + next);
+            }else{
+                storageConfig.set("players."+id.toString()+".xp", Integer.parseInt(playersINFO.get(id).get("xp"))+xp);
+                storageConfig.saveConfig();
+                Map<String, String> cache = playersINFO.get(id);
+                cache.put("xp", String.valueOf(Integer.parseInt(playersINFO.get(id).get("xp"))+xp));
+                playersINFO.put(id, cache);
+                if(levelUp(id)!=null){
+                    String returnResult = levelUp(id);
+                    if(returnResult.startsWith("no")){
+                        String[] splits = returnResult.split("#");
+                        String next = splits[1];
+                        msg.send(Bukkit.getPlayer(id), "a", splits[0].replace("no", "")+" more XP to level " + next);
+                    }
                 }
             }
         }

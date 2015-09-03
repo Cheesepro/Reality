@@ -3,6 +3,7 @@ package me.cheesepro.reality.utils;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.abilities.AbilitiesINFO;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -42,6 +43,7 @@ public class RankGiver {
     }
 
     public void giveRank(final Player p){
+        p.setGameMode(GameMode.SURVIVAL);
         allowranks.clear();
         randomranks.clear();
         for (PermissionAttachmentInfo perm : p.getEffectivePermissions()) {

@@ -4,12 +4,14 @@ import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.RankGiver;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -34,6 +36,13 @@ public class RespawnListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void respawnListener(PlayerRespawnEvent e) {
         final Player p = e.getPlayer();
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                p.setGameMode(GameMode.CREATIVE);
+                p.setGameMode(GameMode.SURVIVAL);
+            }
+        }.runTaskLater(plugin, 20);
         p.setCanPickupItems(true);
         if (!dataManager.getInGamePlayersList().contains(p.getUniqueId())) {
             Location loc = new Location(Bukkit.getWorld(settings.get("respawnlocation").get(0)),

@@ -8,7 +8,10 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +40,17 @@ public class CratesBreakingPreventer implements Listener{
                 e.setCancelled(true);
                 msg.send(e.getPlayer(), "c", "You are not allowed to break lucky crates!");
             }
+        }
+    }
+
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        List<Block> destroyed = event.blockList();
+        Iterator<Block> it = destroyed.iterator();
+        while (it.hasNext()) {
+            Block block = it.next();
+            if(tools.validateCrate(block.getLocation().getBlockX(),block.getLocation().getBlockY(),block.getLocation().getBlockZ()))
+                it.remove();
         }
     }
 

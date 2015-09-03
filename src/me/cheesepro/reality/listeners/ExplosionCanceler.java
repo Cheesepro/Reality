@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
  */
 public class ExplosionCanceler implements Listener{
 
-    Reality plugin;
+    private Reality plugin;
 
     public ExplosionCanceler(Reality plugin){
         this.plugin = plugin;

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -122,6 +123,12 @@ public class LuckyCrates implements Listener {
                     Integer amount = Integer.parseInt(itemInfoList[2]);
                     ItemStack item = new ItemStack(Material.getMaterial(material), amount);
                     e.getWhoClicked().getInventory().addItem(item);
+                    HashMap<Integer, ItemStack> nope = e.getWhoClicked().getInventory().addItem(item);
+                    for(Map.Entry<Integer, ItemStack> entry : nope.entrySet())
+                    {
+                        msg.send((Player)e.getWhoClicked(), "d", "Your inventory is full, placing your reward(s) on the ground!");
+                        e.getWhoClicked().getWorld().dropItemNaturally(e.getWhoClicked().getLocation(), entry.getValue());
+                    }
                     if (got == 1) {
                         msg.send((Player) e.getWhoClicked(), "e", "and " + amount + " " + material.toLowerCase().replace("_", " ") + "!");
                     } else {
@@ -140,6 +147,7 @@ public class LuckyCrates implements Listener {
             } else {
                 e.getWhoClicked().getInventory().getItemInHand().setAmount(e.getWhoClicked().getInventory().getItemInHand().getAmount() - 1);
             }
+            e.getWhoClicked().closeInventory();
         } else {
             e.setCancelled(true);
         }
@@ -152,7 +160,6 @@ public class LuckyCrates implements Listener {
             if (e.getCursor().getType() == crateKey.getType() && e.getCursor().getItemMeta().getDisplayName().equalsIgnoreCase(crateKey.getItemMeta().getDisplayName())) {
                 if (e.getCursor().getAmount() == e.getCursor().getMaxStackSize()) {
                     e.setCancelled(true);
-                    p.closeInventory();
                     msg.send(p, "4", "HEY! What are you doing?! Please do not attempt to clone crate keys!!!");
                 }
             }

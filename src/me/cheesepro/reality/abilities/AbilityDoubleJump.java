@@ -72,12 +72,14 @@ public class AbilityDoubleJump implements Abilities, Listener{
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
-        if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
-            p.setAllowFlight(true);
-            p.setFlying(false);
-        } else {
-            p.setAllowFlight(false);
-            p.setFlying(false);
+        if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
+            if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
+                p.setAllowFlight(true);
+                p.setFlying(false);
+            } else {
+                p.setAllowFlight(false);
+                p.setFlying(false);
+            }
         }
     }
 
@@ -85,7 +87,7 @@ public class AbilityDoubleJump implements Abilities, Listener{
     public void onPlayerFly(PlayerToggleFlightEvent e) {
         final Player p = e.getPlayer();
         if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
-            if (p.getGameMode() != GameMode.CREATIVE) {
+            if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
                 e.setCancelled(true);
                 p.setAllowFlight(false);
                 if (coolDownManager.containsPlayer(getName(), p)) {
@@ -102,14 +104,16 @@ public class AbilityDoubleJump implements Abilities, Listener{
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
-            if ((e.getPlayer().getGameMode() != GameMode.CREATIVE) &&
-                    (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)) {
-                p.setAllowFlight(true);
+        if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
+            if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
+                if ((e.getPlayer().getGameMode() != GameMode.CREATIVE) &&
+                        (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)) {
+                    p.setAllowFlight(true);
+                }
+            } else {
+                p.setAllowFlight(false);
+                p.setFlying(false);
             }
-        } else {
-            p.setAllowFlight(false);
-            p.setFlying(false);
         }
     }
 }
