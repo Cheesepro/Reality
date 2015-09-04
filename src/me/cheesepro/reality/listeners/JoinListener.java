@@ -5,7 +5,7 @@ import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.DataManager;
 import me.cheesepro.reality.utils.Messenger;
-import me.cheesepro.reality.utils.RankGiver;
+import me.cheesepro.reality.utils.RankManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,7 +29,7 @@ public class JoinListener implements Listener{
     private Map<UUID, Map<String, String>> playersINFO;
     private Map<String, List<String>> settings;
     private Config storageConfig;
-    private RankGiver rankGiver;
+    private RankManager rankManager;
     private DataManager dataManager;
     private BRoomManager bRoomManager;
     private Messenger msg;
@@ -39,7 +39,7 @@ public class JoinListener implements Listener{
         playersINFO = plugin.getPlayersINFO();
         storageConfig = plugin.getStorageConfig();
         settings = plugin.getSettings();
-        rankGiver = new RankGiver(plugin);
+        rankManager = new RankManager(plugin);
         dataManager = new DataManager(plugin);
         bRoomManager = new BRoomManager(plugin);
         msg = new Messenger(plugin);
@@ -75,7 +75,7 @@ public class JoinListener implements Listener{
             for(String rankCache : settings.get("allowed_ranks")){
                 user.addPermission("reality.rank."+rankCache);
             }
-            rankGiver.giveRank(p);
+            rankManager.giveRank(p);
         }else{
             if(dataManager.containsQuitBRoom(p)){
                 p.teleport(bRoomManager.getBRoom(dataManager.getQuitBRoom(p)).getEnd());

@@ -1,10 +1,7 @@
 package me.cheesepro.reality.commands;
 
 import me.cheesepro.reality.Reality;
-import me.cheesepro.reality.utils.Config;
-import me.cheesepro.reality.utils.Messenger;
-import me.cheesepro.reality.utils.PlayerManager;
-import me.cheesepro.reality.utils.Tools;
+import me.cheesepro.reality.utils.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,6 +11,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Mark on 2015-07-14.
@@ -26,7 +24,9 @@ public class CommandsManager implements CommandExecutor{
     private List<String> cratesItems;
     private Map<String, Map<String, Integer>> cratesLocations;
     private Config cratesConfig;
+    private Map<UUID, Map<String, String>> playersINFO;
     private PlayerManager pManager;
+    private RankManager rankManager;
 
     private CratesCommands cratesCommands;
     private BossesCommands bossesCommands;
@@ -42,6 +42,9 @@ public class CommandsManager implements CommandExecutor{
 
         cratesCommands = new CratesCommands(plugin);
         bossesCommands = new BossesCommands(plugin);
+
+        playersINFO = plugin.getPlayersINFO();
+        rankManager = new RankManager(plugin);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
@@ -86,6 +89,14 @@ public class CommandsManager implements CommandExecutor{
                         add("");
                     }});
                     return true;
+                }else if(args[0].equalsIgnoreCase("assignRandomRank")){
+                    Map<String, String> cache = playersINFO.get(p.getUniqueId());
+                    if(cache.get("rank")!=null){
+                        msg.send(p, "c", "You already have a rank, therefore you can not be assigned to another rank.");
+                    }else{
+                        rankManager.giveRank(p);
+                    }
+                    return true;
                 }
                 if(pManager.hasAdminPermission(p)){
                     if(args[0].equalsIgnoreCase("crateslist")){
@@ -123,10 +134,6 @@ public class CommandsManager implements CommandExecutor{
                         msg.send(p, "a", "Type " + ChatColor.YELLOW + "/reality" + ChatColor.GREEN + " for help");
                     }
                 }
-            }
-        }else{
-            if(cmd.getLabel().equalsIgnoreCase("reality")){
-
             }
         }
         return false;

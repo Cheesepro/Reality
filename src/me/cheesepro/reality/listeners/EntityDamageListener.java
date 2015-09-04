@@ -43,28 +43,30 @@ public class EntityDamageListener implements Listener{
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e){
-        if(e.getDamager().isCustomNameVisible()){
-            if(e.getDamager().getCustomName().startsWith(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS ")){
-                if(CitizensAPI.getNPCRegistry().isNPC(e.getDamager())){
-                    if(bossesAPI.getBoss(e.getDamager().getType().name())!=null){
-                        if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("spider")){
-                            bossSpider.useAbility((Player)e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("cow")){
-                            bossCow.onHit((Player) e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("pig")){
-                            bossPig.onHit((Player) e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("creeper")){
-                            bossCreeper.useAbility((Player)e.getEntity(), e.getDamager());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("skeleton")){
-                            bossSkeleton.useAbility((Player)e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("blaze")){
-                            bossBlaze.useAbility((Player) e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("enderman")){
-                            bossEnderman.onHit((Player)e.getEntity());
-                        }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("zombie")){
-                            bossZombie.onHit((Player)e.getEntity());
+        if (!(e.getEntity() instanceof Player)) {
+            if (e.getDamager().isCustomNameVisible()){
+                if(e.getDamager().getCustomName().startsWith(ChatColor.RED.toString() + ChatColor.BOLD + "BOSS ")){
+                    if(CitizensAPI.getNPCRegistry().isNPC(e.getDamager())){
+                        if(bossesAPI.getBoss(e.getDamager().getType().name())!=null){
+                            if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("spider")){
+                                bossSpider.useAbility((Player)e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("cow")){
+                                bossCow.onHit((Player) e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("pig")){
+                                bossPig.onHit((Player) e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("creeper")){
+                                bossCreeper.useAbility((Player)e.getEntity(), e.getDamager());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("skeleton")){
+                                bossSkeleton.useAbility((Player)e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("blaze")){
+                                bossBlaze.useAbility((Player) e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("enderman")){
+                                bossEnderman.onHit((Player)e.getEntity());
+                            }else if(bossesAPI.getBoss(e.getDamager().getType().name()).getType().equalsIgnoreCase("zombie")){
+                                bossZombie.onHit((Player)e.getEntity());
+                            }
+                            e.setDamage(bossesAPI.getBoss(e.getDamager().getType().name()).getDamage());
                         }
-                        e.setDamage(bossesAPI.getBoss(e.getDamager().getType().name()).getDamage());
                     }
                 }
             }

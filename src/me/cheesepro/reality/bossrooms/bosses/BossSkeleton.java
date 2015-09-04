@@ -92,10 +92,7 @@ public class BossSkeleton implements Bosses {
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
         creature.setFireTicks(0);
-        ItemStack chestplate = new ItemStack(Material.DIAMOND_CHESTPLATE);
         ItemStack hat = new ItemStack(Material.IRON_HELMET);
-        ItemStack boot = new ItemStack(Material.DIAMOND_BOOTS);
-        ItemStack legging = new ItemStack(Material.DIAMOND_LEGGINGS);
         ItemStack sword = new ItemStack(Material.IRON_AXE);
         creature.getEquipment().setHelmet(hat);
         creature.getEquipment().setItemInHand(sword);

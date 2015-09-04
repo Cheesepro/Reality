@@ -16,12 +16,12 @@ import java.util.*;
 /**
  * Created by Mark on 2015-05-10.
  */
-public class RankGiver {
+public class RankManager {
 
     private Reality plugin;
     private Map<String, List<String>> settings;
     private Map<String, String> messages;
-    private Map<Integer, String> randomranks = new HashMap<Integer, String>();
+    private List<String> randomranks = new ArrayList<String>();
     private List<String> allowranks = new ArrayList<String>();
     private Map<UUID, Map<String, String>> playersINFO;
     private Messenger msg;
@@ -30,7 +30,7 @@ public class RankGiver {
     private Tools tools;
     private DataManager dataManager;
 
-    public RankGiver(Reality plugin){
+    public RankManager(Reality plugin){
         this.plugin = plugin;
         settings = plugin.getSettings();
         messages = plugin.getMessages();
@@ -51,12 +51,17 @@ public class RankGiver {
                 allowranks.add(perm.getPermission().replace("reality.rank.", ""));
             }
         }
-        int randomrankscount = 0;
+        int randomrankscount = -1;
         for(String rank : allowranks){
             randomrankscount++;
-            randomranks.put(randomrankscount, rank);
+            randomranks.add(rank);
         }
-        String rank = randomranks.get(tools.randInt(1, randomrankscount));
+        if(randomrankscount==-1){
+            msg.send(p, "c", "Sorry, currently there are no ranks for you!");
+            clearRank(p);
+            return;
+        }
+        String rank = randomranks.get(tools.randInt(0, randomrankscount));
         List<String> usedatabase = settings.get("use-database");
         if(Boolean.parseBoolean(usedatabase.get(0))){
             //TODO add database storage feature
@@ -119,4 +124,11 @@ public class RankGiver {
         allowranks.clear();
     }
 
+    public void clearRank(Player p){
+        storageConfig.set("players." + p.getUniqueId().toString() + ".rank", null);
+        storageConfig.saveConfig();
+        Map<String, String> cache = playersINFO.get(p.getUniqueId());
+        cache.remove("rank");
+        playersINFO.put(p.getUniqueId(), cache);
+    }
 }
