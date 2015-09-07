@@ -121,8 +121,8 @@ public class BossesPathFinding {
                             }
                         }
                     }
-                }.runTaskTimerAsynchronously(plugin, 0, 20);
-                //TODO FIX UNSAFE THREAD
+                }.runTaskTimer(plugin, 0, 20);
+                //TODO Make thread async
                 //20 ticks = 1 sec;
             }
         }

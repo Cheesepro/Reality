@@ -29,7 +29,7 @@ public class AbilityCobweb implements Abilities, Listener{
 
     @Override
     public String getDesc() {
-        return "Set the closest player in to cobweb";
+        return "Give the closest slowness 6 for 3 seconds";
     }
 
     private Reality plugin;
@@ -65,15 +65,6 @@ public class AbilityCobweb implements Abilities, Listener{
                     Boolean anyone = false;
                     for (Entity e : p.getNearbyEntities(10, 10, 10)) {
                         if (e instanceof Player) {
-//                            Player closestP = (Player) e;
-//                            Location loc = closestP.getLocation();
-//                            loc.setY(loc.getY() + 1);
-//                            Block block = closestP.getWorld().getBlockAt(loc);
-//                            if (block.getType() == Material.AIR) {
-//                                block.setType(Material.WEB);
-//                                anyone = true;
-//                                msg.send(closestP, "6", "Some one got you with their ability!");
-//                            }
                             PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOW, 3*20, 6);
                             ((Player) e).addPotionEffect(potionEffect);
                             anyone = true;
@@ -83,7 +74,7 @@ public class AbilityCobweb implements Abilities, Listener{
                     if (anyone) {
                         msg.send(p, "2", "Got someone!");
                     } else {
-                        msg.send(p, "5", "Cobweb cannot be placed with in 10 blocks of radius.");
+                        msg.send(p, "5", "No one is around you within 10 blocks of radius!");
                     }
 
                     coolDownManager.addCooldown(getName(), p, Integer.parseInt(abilitiesOptions.get(getName()).get("cooldown")));

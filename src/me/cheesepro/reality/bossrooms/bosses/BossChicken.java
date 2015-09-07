@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 
 /**
@@ -84,6 +86,8 @@ public class BossChicken implements Bosses{
         npc.spawn(loc);
         npc.setProtected(false);
         Creature creature = (Creature) npc.getEntity();
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED,10000, 3);
+        creature.addPotionEffect(potionEffect);
         bossesAPI.basicSetup(creature, health);
     }
     public void spawn(Location loc){

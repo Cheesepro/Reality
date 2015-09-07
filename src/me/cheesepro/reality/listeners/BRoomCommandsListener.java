@@ -89,7 +89,7 @@ public class BRoomCommandsListener implements Listener{
                                         msg.send(p, "d", "Sorry, player " + args[1] + " is already in a boss room!");
                                     }
                                 } else {
-                                    msg.send(p, "d", args[1] + " is already invited by someone.");
+                                    msg.send(p, "d", "You must wait " + timeoutCount.get(Bukkit.getPlayer(args[1]).getUniqueId()) + " seconds before trying to invite " +args[1]);
                                 }
                             } else {
                                 msg.send(p, "d", "Sorry, player " + args[1] + " is not valid!");
