@@ -3,18 +3,16 @@ package me.cheesepro.reality.abilities;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.Messenger;
 import me.cheesepro.reality.utils.Tools;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
 import java.util.Map;
@@ -54,30 +52,12 @@ public class AbilityDoubleJump implements Abilities, Listener{
         return "Click jump key twice to jump higher";
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(final PlayerJoinEvent e)
-    {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                Player p = e.getPlayer();
-                if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
-                    p.setAllowFlight(true);
-                    p.setFlying(false);
-                }
-            }
-        }, 10);
-    }
-
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent e) {
+    public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
             if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
                 p.setAllowFlight(true);
-                p.setFlying(false);
-            } else {
-                p.setAllowFlight(false);
                 p.setFlying(false);
             }
         }
@@ -86,16 +66,16 @@ public class AbilityDoubleJump implements Abilities, Listener{
     @EventHandler
     public void onPlayerFly(PlayerToggleFlightEvent e) {
         final Player p = e.getPlayer();
-        if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
-            if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
+        if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
+            if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName())) {
                 e.setCancelled(true);
                 p.setAllowFlight(false);
+                p.setFlying(false);
                 if (coolDownManager.containsPlayer(getName(), p)) {
                     msg.send(p, "c", "You must wait for " + ChatColor.GREEN + coolDownManager.getCooldown(getName(), p) + ChatColor.RED + " seconds, before using " + ChatColor.LIGHT_PURPLE + getName() + ChatColor.RED + " again!");
                     return;
                 }
                 p.setVelocity(p.getLocation().getDirection().multiply(1.20D).setY(0.8D));
-
                 coolDownManager.addCooldown(getName(), p, Integer.parseInt(abilitiesOptions.get(getName()).get("cooldown")));
             }
         }
@@ -110,10 +90,22 @@ public class AbilityDoubleJump implements Abilities, Listener{
                         (p.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)) {
                     p.setAllowFlight(true);
                 }
-            } else {
-                p.setAllowFlight(false);
-                p.setFlying(false);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+                Player p = (Player) event.getEntity();
+                if (tools.canUseAbility(playersINFO.get(p.getUniqueId()).get("rank"), getName()) && coolDownManager.containsPlayer(getName(), p)) {
+                    if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
     }
 }
+//}

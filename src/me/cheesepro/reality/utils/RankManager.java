@@ -119,9 +119,10 @@ public class RankManager {
             public void run(){
                 GraphicalAPI.sendTitleToPlayer(p, 0, 5, 1, ChatColor.RED + "Please", ChatColor.GOLD + "Cherish your life");
             }
-        }.runTaskLater(plugin, 6*20);
+        }.runTaskLater(plugin, 6 * 20);
         randomranks.clear();
         allowranks.clear();
+        MVdWPlaceholderAPI.updateRankPH();
     }
 
     public void clearRank(Player p){
@@ -130,5 +131,6 @@ public class RankManager {
         Map<String, String> cache = playersINFO.get(p.getUniqueId());
         cache.remove("rank");
         playersINFO.put(p.getUniqueId(), cache);
+        MVdWPlaceholderAPI.updateRankPH();
     }
 }

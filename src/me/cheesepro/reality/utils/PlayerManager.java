@@ -93,6 +93,7 @@ public class PlayerManager {
                         msg.send(Bukkit.getPlayer(id), "a", splits[0].replace("no", "")+" more XP to level " + next);
                     }
                 }
+                MVdWPlaceholderAPI.updateXPPH();
             }
         }
     }
@@ -110,7 +111,7 @@ public class PlayerManager {
     public String levelUp(UUID id){
         if(playersINFO.get(id)!=null){
             int nextH = Integer.parseInt(playersINFO.get(id).get("level"))+1;
-            String next = String.valueOf(nextH);
+            final String next = String.valueOf(nextH);
             if(Integer.parseInt(playersINFO.get(id).get("xp"))>=levels.get(next)){
                 setLevel(id, nextH);
                 EffectsAPI.firework(id, FireworkEffect.Type.STAR);
@@ -118,6 +119,7 @@ public class PlayerManager {
                 EffectsAPI.firework(id, FireworkEffect.Type.BURST);
                 GraphicalAPI.sendTitleToPlayer(Bukkit.getPlayer(id), 1, 8, 1, "&a&lLeveled up!", "&f&lYou are now level " + next);
                 msg.send(Bukkit.getPlayer(id), "d", "Leveled UP! You are now level " + next);
+                MVdWPlaceholderAPI.updateLevelPH();
                 return "yes";
             } else{
                 return "no"+String.valueOf(levels.get(next) - Integer.parseInt(playersINFO.get(id).get("xp")))+"#"+next;

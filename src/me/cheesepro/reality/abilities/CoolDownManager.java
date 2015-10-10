@@ -65,15 +65,15 @@ public class CoolDownManager {
                     }
                 }
             }.runTaskTimerAsynchronously(plugin, 20, 20);
-            //20 ticks = 1 sec;
         }
     }
 
     public boolean containsPlayer(String ability, Player p){
         if(cooldownTime.containsKey(ability)){
             return cooldownTime.get(ability).containsKey(p.getUniqueId());
+        }else{
+            return false;
         }
-        return false;
     }
 
     public Integer getCooldown(String ability, Player p){

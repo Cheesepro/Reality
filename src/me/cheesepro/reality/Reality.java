@@ -15,6 +15,7 @@ import me.cheesepro.reality.luckycrates.LuckyCrates;
 import me.cheesepro.reality.utils.Config;
 import me.cheesepro.reality.utils.ConfigManager;
 import me.cheesepro.reality.utils.Logger;
+import me.cheesepro.reality.utils.MVdWPlaceholderAPI;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
 import org.bukkit.event.HandlerList;
@@ -240,6 +241,7 @@ public class Reality extends JavaPlugin implements Listener{
                 logger.warn("WorldGuard dependency not found!");
             }
             logger.info("Successfully Enabled");
+            MVdWPlaceholderAPI.updateAllPlaceHolders();
         }catch (Exception e){
             logger.error(e);
         }

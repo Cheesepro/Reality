@@ -2,10 +2,7 @@ package me.cheesepro.reality.listeners;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
-import me.cheesepro.reality.utils.Config;
-import me.cheesepro.reality.utils.DataManager;
-import me.cheesepro.reality.utils.Messenger;
-import me.cheesepro.reality.utils.RankManager;
+import me.cheesepro.reality.utils.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -88,6 +85,7 @@ public class JoinListener implements Listener{
                 }.runTaskLater(plugin, 20);
             }
         }
+        MVdWPlaceholderAPI.updateAllPlaceHolders();
     }
 
 }
