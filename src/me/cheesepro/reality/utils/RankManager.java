@@ -74,6 +74,7 @@ public class RankManager {
         }
         if(dataManager.containsRanksHealth(rank)){
             p.setMaxHealth(dataManager.getRanksHealth(rank));
+            p.setHealth(dataManager.getRanksHealth(rank));
         }
         if(dataManager.containsRanksKit(rank)){
             for(String itemInfoCache : dataManager.getRanksKit(rank)){
@@ -83,8 +84,11 @@ public class RankManager {
                 ItemStack item = new ItemStack(Material.getMaterial(itemCache.toUpperCase()), itemAmountCache);
                 ItemMeta im = item.getItemMeta();
                 String itemName = im.getDisplayName();
-                if(splits[2]!=null){
+                if(splits.length==3){
                     itemName = splits[2];
+                }else if (splits.length==4){
+                    itemName = splits[2];
+                    item.setDurability(Short.parseShort(splits[3]));
                 }
                 im.setDisplayName(ChatColor.translateAlternateColorCodes('&',itemName));
                 item.setItemMeta(im);

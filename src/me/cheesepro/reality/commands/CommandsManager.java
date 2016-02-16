@@ -2,6 +2,7 @@ package me.cheesepro.reality.commands;
 
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.utils.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -89,14 +90,6 @@ public class CommandsManager implements CommandExecutor{
                         add("");
                     }});
                     return true;
-                }else if(args[0].equalsIgnoreCase("assignRandomRank")){
-                    Map<String, String> cache = playersINFO.get(p.getUniqueId());
-                    if(cache.get("rank")!=null){
-                        msg.send(p, "c", "You already have a rank, therefore you can not be assigned to another rank.");
-                    }else{
-                        rankManager.giveRank(p);
-                    }
-                    return true;
                 }
                 if(pManager.hasAdminPermission(p)){
                     if(args[0].equalsIgnoreCase("crateslist")){
@@ -134,6 +127,17 @@ public class CommandsManager implements CommandExecutor{
                         msg.send(p, "a", "Type " + ChatColor.YELLOW + "/reality" + ChatColor.GREEN + " for help");
                     }
                 }
+            }
+        }else{
+            if(cmd.getLabel().equalsIgnoreCase("assignRandomRank")){
+                Player target = Bukkit.getPlayer(args[0]);
+                Map<String, String> cache = playersINFO.get(target.getUniqueId());
+                if(cache.get("rank")!=null){
+                    msg.send(target, "c", "You already have a rank, therefore you can not be assigned to another rank.");
+                }else{
+                    rankManager.giveRank(target);
+                }
+                return true;
             }
         }
         return false;

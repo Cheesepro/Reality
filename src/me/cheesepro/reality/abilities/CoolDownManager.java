@@ -56,9 +56,11 @@ public class CoolDownManager {
                     }
                     if(!toBeRemoved.isEmpty() || !toBeRemoved.toString().equalsIgnoreCase("{}")){
                         for(String ability : toBeRemoved.keySet()){
-                            cooldownTime.get(ability).remove(toBeRemoved.get(ability));
-                            if(cooldownTime.get(ability).isEmpty() || cooldownTime.get(ability).toString().equalsIgnoreCase("{}")){
-                                cooldownTime.remove(ability);
+                            if (cooldownTime.get(ability).containsKey(toBeRemoved.get(ability))){
+                                cooldownTime.get(ability).remove(toBeRemoved.get(ability));
+                                if(cooldownTime.get(ability).isEmpty() || cooldownTime.get(ability).toString().equalsIgnoreCase("{}")){
+                                    cooldownTime.remove(ability);
+                                }
                             }
                         }
                         toBeRemoved.clear();

@@ -58,7 +58,7 @@ public class BRoom {
                 dataManager.getBRoomsLocations(name).get("lobby").get("z"),
                 Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(name).get("lobby").get("pitch"))),
                 Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(name).get("lobby").get("yaw"))));
-        end = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+        end = new Location(Bukkit.getServer().getWorld("world"),
                 dataManager.getBRoomsLocations(name).get("end").get("x"),
                 dataManager.getBRoomsLocations(name).get("end").get("y"),
                 dataManager.getBRoomsLocations(name).get("end").get("z"),
@@ -96,7 +96,7 @@ public class BRoom {
                 dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("z"),
                 Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("pitch"))),
                 Float.parseFloat(String.valueOf(dataManager.getBRoomsLocations(getBRoomName()).get("lobby").get("yaw"))));
-        end = new Location(Bukkit.getServer().getWorld(dataManager.getBossesWorld()),
+        end = new Location(Bukkit.getServer().getWorld("world"),
                 dataManager.getBRoomsLocations(getBRoomName()).get("end").get("x"),
                 dataManager.getBRoomsLocations(getBRoomName()).get("end").get("y"),
                 dataManager.getBRoomsLocations(getBRoomName()).get("end").get("z"),

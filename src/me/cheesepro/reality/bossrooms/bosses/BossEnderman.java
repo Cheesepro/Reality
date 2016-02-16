@@ -103,7 +103,7 @@ public class BossEnderman implements Bosses {
     public void useAbility(Location loc){
         for(int i = 0; i<6; i++){
             Endermite endermite = loc.getWorld().spawn(loc, Endermite.class);
-            endermite.setCustomName(ChatColor.RED + "!!!");
+            endermite.setCustomName(ChatColor.LIGHT_PURPLE + "Enderman");
             endermite.setCustomNameVisible(true);
         }
     }

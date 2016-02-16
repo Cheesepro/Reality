@@ -42,12 +42,6 @@ public class Reality extends JavaPlugin implements Listener{
     private Map<String, List<String>> settings = new HashMap<String, List<String>>();
 
     /*
-     * This map stores all the information about ranks such as the name, health, starting-kits and abilities of a rank.</b>
-     * Format: (Rank name, Map(name/health/starting-kits/abilities, List(value)))
-     */
-//    private Map<String, Map<String, List<String>>> ranks = new HashMap<String, Map<String, List<String>>>();
-
-    /*
      * This map stores name information about ranks
      */
     private Map<String, String> ranksName = new HashMap<String, String>();
@@ -271,6 +265,7 @@ public class Reality extends JavaPlugin implements Listener{
         CommandsManager commandsManager = new CommandsManager(this);
         getCommand("reality").setExecutor(commandsManager);
         getCommand("bossroom").setExecutor(commandsManager);
+        getCommand("assignRandomRank").setExecutor(commandsManager);
         getCommand("room").setExecutor(commandsManager);
     }
 
@@ -343,8 +338,8 @@ public class Reality extends JavaPlugin implements Listener{
             cords.add(getConfig().getString("RespawnLocation.x"));
             cords.add(getConfig().getString("RespawnLocation.y"));
             cords.add(getConfig().getString("RespawnLocation.z"));
-            cords.add(getConfig().getString("RespawnLocation.pitch"));
             cords.add(getConfig().getString("RespawnLocation.yaw"));
+            cords.add(getConfig().getString("RespawnLocation.pitch"));
             settings.put("respawnlocation", cords);
         }else{
             world = getServer().getWorld("world");
@@ -384,9 +379,16 @@ public class Reality extends JavaPlugin implements Listener{
                     List<String> kitsCache = new ArrayList<String>();
                     for(String kititemcache : ranksConfig.getConfigurationSection("ranks."+rank+".starting-kit").getKeys(false)){
                         if(ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name")!=null){
-                            kitsCache.add(kititemcache+
-                                    "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount")+
-                                    "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name"));
+                            if(ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".metadata")!=null){
+                                kitsCache.add(kititemcache+
+                                        "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount")+
+                                        "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name")+
+                                        "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".metadata"));
+                            }else{
+                                kitsCache.add(kititemcache+
+                                        "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount")+
+                                        "#"+ ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".item_name"));
+                            }
                         }else{
                             kitsCache.add(kititemcache+"#"+ranksConfig.get("ranks."+rank+".starting-kit."+kititemcache+".amount"));
                         }

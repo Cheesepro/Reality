@@ -19,6 +19,8 @@
      description: Bossroom command (short)
      permission: reality.default
      permission-message: You don't have Permission!!
+   assignrandomrank:
+     description: Assign random rank
  permissions:
    reality.admin:
      default: op

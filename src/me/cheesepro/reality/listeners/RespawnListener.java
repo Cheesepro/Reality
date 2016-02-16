@@ -55,6 +55,7 @@ public class RespawnListener implements Listener{
                     Float.parseFloat(settings.get("respawnlocation").get(5)));
             e.setRespawnLocation(loc);
             rankManager.clearRank(p);
+            p.setMaxHealth(2.0);
             GraphicalAPI.sendTitleToPlayer(p, 1, 4, 0, p.getName(), "You just lost your body");
             new BukkitRunnable(){
                 @Override

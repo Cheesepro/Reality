@@ -82,8 +82,7 @@ public class EntityDamageListener implements Listener{
                             if (bossesAPI.getBoss(e.getEntity().getType().name()) != null) {
                                 Player p = (Player) e.getDamager();
                                 Creature boss = (Creature)e.getEntity();
-//                                GraphicalAPI.sendHotBarText(ChatColor.RED + ChatColor.BOLD.toString() + "Boss health: " + ChatColor.RED.toString() + boss.getHealth()/2 + ChatColor.WHITE.toString() + "/" + ChatColor.GREEN.toString() + boss.getMaxHealth()/2, p);
-                                GraphicalAPI.sendTitleToPlayer(p, 0, 1, 0, "", ChatColor.YELLOW + "Boss health: " + ChatColor.RED.toString() + boss.getHealth()/2 + ChatColor.WHITE.toString() + "/" + ChatColor.GREEN.toString() + boss.getMaxHealth()/2);
+                                GraphicalAPI.sendTitleToPlayer(p, 0, 1, 0, "", ChatColor.YELLOW + "Boss health: " + ChatColor.RED.toString() + Math.round(boss.getHealth()/2) + ChatColor.WHITE.toString() + "/" + ChatColor.GREEN.toString() + Math.round(boss.getMaxHealth()/2));
                             }
                         }
                     }

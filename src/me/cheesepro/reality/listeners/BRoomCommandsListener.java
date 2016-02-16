@@ -115,6 +115,7 @@ public class BRoomCommandsListener implements Listener{
                     if(bRoom.getState() == BRoom.BRoomState.LOBBY){
                         bRoom.addPlayer(p);
                         msg.send(p, "d", "You can only access to the command /quit right now.");
+                        msg.send(Bukkit.getPlayer(invitedPlayer.get(p.getUniqueId())), "a", p.getName() + " have accepted your invitation!");
                     }else{
                         msg.send(p, "c", "Sorry but the boss room that you were invited to is currently not accepting new players to join.");
                     }
