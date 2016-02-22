@@ -3,6 +3,8 @@ package me.cheesepro.reality.listeners;
 import me.cheesepro.reality.Reality;
 import me.cheesepro.reality.bossrooms.rooms.BRoomManager;
 import me.cheesepro.reality.utils.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -47,6 +49,10 @@ public class JoinListener implements Listener{
     public void NewPlayerJoin(PlayerJoinEvent e){
         final Player p = e.getPlayer();
         if(!p.hasPlayedBefore()){
+            //WEIRD BED SPAWN THING THAT ESSENTIAL MESS WITH
+            Location bedspawn = new Location(Bukkit.getWorld("world"), -0.5,66,0.5,(float)158.413,(float)5.324);
+            p.setBedSpawnLocation(bedspawn, true);
+            //END
             String uuid = p.getUniqueId().toString();
             String rank = plugin.getConfig().getString("Default_rank");
             storageConfig.set("players." + p.getUniqueId() + ".rank", rank);

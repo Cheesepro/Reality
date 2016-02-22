@@ -12,6 +12,7 @@ public class MVdWPlaceholderAPI{
 
     private static Reality plugin = Reality.getPlugin();
     private static PlayerManager playerManager = new PlayerManager(plugin);
+    private static DataManager dataManager = new DataManager(plugin);
 
     public static void updateAllPlaceHolders(){
         updateLevelPH();
@@ -32,7 +33,7 @@ public class MVdWPlaceholderAPI{
         PlaceholderAPI.registerPlaceholder(plugin, "reality_rank", new PlaceholderReplacer() {
             @Override
             public String onPlaceholderReplace(PlaceholderReplaceEvent e) {
-                return playerManager.getRank(e.getPlayer().getUniqueId()) + "";
+                return dataManager.getRanksName(playerManager.getRank(e.getPlayer().getUniqueId())) + "";
             }
         });
     }
